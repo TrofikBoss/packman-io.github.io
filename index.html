@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/style.css">
+    <title>Document</title>
+</head>
+<body>
+    <div id="game">
+        <div class="game__menu page">
+            <div class="menu__header">
+                <h2>PackMan.io</h2>
+            </div>
+            <div class="menu__bottom">
+                <div class="menu__left">
+                    <div class="menu__form">
+                        <input type="text" id="name" placeholder="Ваш ник" autocomplete="none">
+                        <button onclick="changename = document.querySelector('#name').value">Сохранить</button>
+                    </div>
+                    <div class="button" id="gamestart">Начать игру</div>
+                </div>
+                <div class="menu__right">
+                    <div class="page learn"></div>
+                </div>
+            </div>
+        </div>
+        <div class="page leaderboard">
+            <h2>Лидеры</h2>
+            <ul>
+            </ul>
+        </div>
+        <div class="page leave" style="display: none;">
+            <div class="button" id="leave">Выйти в меню</div>
+        </div>
+        <div class="game__container">
+            <div class="game__area">
+                <div class="game__border"></div>
+            </div>
+        </div>
+    </div>
+    <script src="script/game.js"></script>
+</body>
+</html>
