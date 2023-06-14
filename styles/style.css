@@ -32,7 +32,7 @@ body {
     align-items: center;
     justify-content: center;
     user-select: none;
-    background-image: url(/textures/entity/packman.png);
+    background-image: url(../textures/entity/packman.png);
     background-repeat: no-repeat;
     background-size: 100%;
     background-position: center;
