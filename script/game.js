@@ -75,8 +75,9 @@ class Ghost {
     }
     update() {
         this.check_eat();
-        document.querySelector(`.ghost.id-${this.id + 1}`).style.left = `${this.posx - this.size / 2}px`;
-        document.querySelector(`.ghost.id-${this.id + 1}`).style.top = `${this.posy - this.size / 2}px`;
+        let this_obj = document.querySelector(`.ghost.id-${this.id + 1}`);
+        this_obj.style.left = `${this.posx - this.size / 2}px`;
+        this_obj.style.top = `${this.posy - this.size / 2}px`;
         this.bot_behavior();
     }
 }
@@ -107,7 +108,7 @@ class Packman {
         let doeat = false;
         for (let x = 0; x < drops.length; x++) {
             if (drops[x]) {
-                if(checkbox(this.posx, this.posy, this.size / 2, drops[x].posx, drops[x].posy, 10) == true) {
+                if(checkbox(this.posx, this.posy, this.size / 2, drops[x].posx, drops[x].posy, 20) == true) {
                     this.size += 1;
                     this.score += 1;
                     let elem = document.querySelector(`.drop.id-${Number(x) + 1}`);
@@ -146,9 +147,10 @@ class Packman {
             }
         }
         if (doeat == true) {
-            document.querySelector(`.entity.id-${this.id}`).style.width = `${this.size}px`;
-            document.querySelector(`.entity.id-${this.id}`).style.height = `${this.size}px`;
-            document.querySelector(`.entity.id-${this.id}`).style.fontSize = `${this.size / 2}px`;
+            let this_obj = document.querySelector(`.entity.id-${this.id}`)
+            this_obj.style.width = `${this.size}px`;
+            this_obj.style.height = `${this.size}px`;
+            this_obj.style.fontSize = `${this.size / 2}px`;
         }
     }
     bot_behavior() { // интеллект бота
@@ -227,16 +229,18 @@ class Packman {
             }
         }
         if (domove == true) {
-            document.querySelector(`.entity.id-${this.id}`).style.left = `${this.posx - this.size / 2}px`;
-            document.querySelector(`.entity.id-${this.id}`).style.top = `${this.posy - this.size / 2}px`;
+            let this_obj = document.querySelector(`.entity.id-${this.id}`);
+            this_obj.style.left = `${this.posx - this.size / 2}px`;
+            this_obj.style.top = `${this.posy - this.size / 2}px`;
         }
     }
     update() {
         this.check_eat();
+        let obj_this = document.querySelector(`.entity.id-${player.id}`);
 
         if (this.type == "Xplayer") {
-            document.querySelector(`.entity.id-${player.id}`).style.left = `${document.body.clientWidth / 2 - player.size / 2}px`;
-            document.querySelector(`.entity.id-${player.id}`).style.top = `${document.body.clientHeight / 2 - player.size / 2}px`;
+            obj_this.style.left = `${document.body.clientWidth / 2 - player.size / 2}px`;
+            obj_this.style.top = `${document.body.clientHeight / 2 - player.size / 2}px`;
             if (this.size < 1201) {
                 scale = 1 - ((0.7 / 1150) * this.size);
             } else {
@@ -259,14 +263,14 @@ class Drop {
         this.id = id;
     }
     update() {
-        document.querySelector(`.drop.id-${this.id + 1}`).style.left = `${this.posx - this.size / 2}px`;
-        document.querySelector(`.drop.id-${this.id + 1}`).style.top = `${this.posy - this.size / 2}px`;
-        document.querySelector(`.drop.id-${this.id + 1}`).style.width = `${this.size}px`;
-        document.querySelector(`.drop.id-${this.id + 1}`).style.height = `${this.size}px`;
+        let obj_this = document.querySelector(`.drop.id-${this.id + 1}`);
+        obj_this.style.left = `${this.posx - this.size / 2}px`;
+        obj_this.style.top = `${this.posy - this.size / 2}px`;
+        obj_this.style.width = `${this.size}px`;
+        obj_this.style.height = `${this.size}px`;
         this.size -= 0.1;
         if (this.size < 5) {
-            let elem = document.querySelector(`.drop.id-${this.id + 1}`);
-            elem.parentNode.removeChild(elem);
+            obj_this.parentNode.removeChild(obj_this);
             delete drops[this.id];
         }
     }
@@ -533,50 +537,80 @@ function update() {
 function nickgen() { // генерация ников
     let nick = "";
     let random;
-    for (let act = 0; act < Math.round(Math.random() * 3 + 2); act++) {
-        random = Math.round(Math.random() * 40);
-        switch (random) {
-            case 0: nick += "nik"; break;
-            case 1: nick += "zig"; break;
-            case 2: nick += "zag"; break;
-            case 3: nick += String(Math.round(Math.random() * 100)); break;
-            case 4: nick += "le"; break;
-            case 5: nick += "tro"; break;
-            case 6: nick += "fik"; break;
-            case 7: nick += "tan"; break;
-            case 8: nick += "st"; break;
-            case 9: nick += "fro"; break;
-            case 10: nick += "ru"; break;
-            case 11: nick += "na"; break;
-            case 12: nick += "sa"; break;
-            case 13: nick += "to"; break;
-            case 14: nick += "ske"; break;
-            case 15: nick += "ya"; break;
-            case 16: nick += String(Math.round(Math.random() * 100)); break;
-            case 17: nick += "ra"; break;
-            case 18: nick += "ma"; break;
-            case 19: nick += "by"; break;
-            case 20: nick += String(Math.round(Math.random() * 1 + 23)); break;
-            case 21: nick += "ke"; break;
-            case 22: nick += "iva"; break;
-            case 23: nick += "ra"; break;
-            case 24: nick += "an"; break;
-            case 25: nick += "rd"; break;
-            case 26: nick += "ser"; break;
-            case 27: nick += "ge"; break;
-            case 28: nick += "jo"; break;
-            case 29: nick += "nny"; break;
-            case 30: nick += "ske"; break;
-            case 31: nick += "tan"; break;
-            case 32: nick += "ota"; break;
-            case 33: nick += "ku"; break;
-            case 34: nick += "x"; break;
-            case 35: nick += "su"; break;
-            case 36: nick += "nik"; break;
-            case 37: nick += "egu"; break;
-            case 38: nick += "wa"; break;
-            case 39: nick += "in"; break;
-            case 40: nick += "er"; break;
+    let maxact = Math.round(Math.random() * 2 + 2)
+    for (let act = 0; act < maxact; act++) {
+        random = Math.round(Math.random() * 30);
+        if (act < maxact - 1) {
+            switch (random) {
+                case 0: nick += "zig"; break;
+                case 1: nick += "jo"; break;
+                case 2: nick += "tan"; break;
+                case 3: nick += "sa"; break;
+                case 4: nick += "na"; break;
+                case 5: nick += "nik"; break;
+                case 6: nick += "ni"; break;
+                case 7: nick += "vi"; break;
+                case 8: nick += "ke"; break;
+                case 9: nick += "mi"; break;
+                case 10: nick += "ge"; break;
+                case 11: nick += "ji"; break;
+                case 12: nick += "zi"; break;
+                case 13: nick += "ha"; break;
+                case 14: nick += "be"; break;
+                case 15: nick += "oxy"; break;
+                case 16: nick += "tro"; break;
+                case 17: nick += "fe"; break;
+                case 18: nick += "ar"; break;
+                case 19: nick += "iv"; break;
+                case 20: nick += "a"; break;
+                case 21: nick += "e"; break;
+                case 22: nick += "u"; break;
+                case 23: nick += "ru"; break;
+                case 24: nick += "su"; break;
+                case 25: nick += "x"; break;
+                case 26: nick += "pa"; break;
+                case 27: nick += "ro"; break;
+                case 28: nick += "go"; break;
+                case 29: nick += "mi"; break;
+                case 30: nick += "un"; break;
+            }
+        } else {
+            switch (random) {
+                case 0: nick += "ik"; break;
+                case 1: nick += "zik"; break;
+                case 2: nick += "fik"; break;
+                case 3: nick += "to"; break;
+                case 4: nick += "dik"; break;
+                case 5: nick += "ov"; break;
+                case 6: nick += "ske"; break;
+                case 7: nick += String(Math.round(Math.random() * 100)); break;
+                case 8: nick += String(Math.round(Math.random() * 100)); break;
+                case 9: nick += "ro"; break;
+                case 10: nick += "ji"; break;
+                case 11: nick += "jo"; break;
+                case 12: nick += "ku"; break;
+                case 13: nick += "ma"; break;
+                case 14: nick += "rd"; break;
+                case 15: nick += String(Math.round(Math.random() * 1) + 23); break;
+                case 16: nick += "av"; break;
+                case 17: nick += "ad"; break;
+                case 18: nick += "gon"; break;
+                case 19: nick += "di"; break;
+                case 20: nick += "vs"; break;
+                case 21: nick += "lon"; break;
+                case 22: nick += "ru"; break;
+                case 23: nick += "de"; break;
+                case 24: nick += "sa"; break;
+                case 25: nick += "vi"; break;
+                case 26: nick += "ve"; break;
+                case 27: nick += "io"; break;
+                case 28: nick += "ne"; break;
+                case 29: nick += "ru"; break;
+                case 30: nick += "ti"; break;
+            }
+            if (random * Math.random() > 10) {
+                nick += String(Math.round(Math.random() * 100));
+            }
         }
     }
     return nick;
@@ -599,7 +633,6 @@ function dropgen() { // Генерация сфер
         }
         let obj_drop = document.createElement("div");
         obj_drop.classList.add('drop', `id-${y + 1}`)
-        //document.querySelector(".game__area").innerHTML += `<div class="drop id-${y + 1}"></div>`;
         document.querySelector(".game__area").append(obj_drop);
         document.querySelector(`.drop.id-${y + 1}`).style.left = `${drops[y].posx - drops[y].size / 2}px`;
         document.querySelector(`.drop.id-${y + 1}`).style.top = `${drops[y].posy - drops[y].size / 2}px`;
@@ -611,7 +644,6 @@ function botgen() { // Генерация ботов
         let obj_packman = document.createElement("div");
         obj_packman.classList.add(`packman`, `bot`, `entity`, `id-${entity.length + 1}`);
         document.querySelector(".game__area").append(obj_packman);
-        //document.querySelector(".game__area").innerHTML += `<div class="packman bot entity id-${entity.length + 1}"></div>`;
         entity.push(new Packman(entity.length + 1, Math.random() * borderwidth - borderwidth / 2, Math.random() * borderheight - borderheight / 2, "bot", nickgen()));
         document.querySelector(`.entity.id-${entity.length}`).style.left = `${entity[entity.length - 1].posx - entity[entity.length - 1].size / 2}px`;
         document.querySelector(`.entity.id-${entity.length}`).style.top = `${entity[entity.length - 1].posy - entity[entity.length - 1].size / 2}px`;
@@ -622,7 +654,6 @@ function ghostgen() { // Генерация призраков
     if (gamestart == true) {
         let obj_ghost = document.createElement("div");
         obj_ghost.classList.add("ghost", `id-${ghosts.length + 1}`);
-        //document.querySelector(".game__area").innerHTML += `<div class="ghost id-${ghosts.length + 1}"></div>`;
         document.querySelector(".game__area").append(obj_ghost);
         ghosts.push(new Ghost());
         document.querySelector(`.ghost.id-${ghosts.length}`).style.left = `${ghosts[ghosts.length - 1].posx - ghosts[ghosts.length - 1].size / 2}px`;
@@ -655,7 +686,7 @@ document.querySelector("#leave").addEventListener("click", function() {
     stopgame();
 })
 document.querySelector("#name").addEventListener("keydown", function(a) {
-    if (a.key = "Enter") {
+    if (gamestart == false && a.key == "Enter") {
         changename = document.querySelector('#name').value;
     }
 })
