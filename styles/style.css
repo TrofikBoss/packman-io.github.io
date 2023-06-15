@@ -180,3 +180,78 @@ body {
     width: 350px;
     height: 350px;
 }
+@media (max-width: 800px) {
+    .leaderboard {
+        width: 208px;
+        min-height: 355px;
+    }
+    .leaderboard li {
+        font-size: 17px;
+    }
+    .leaderboard h2 {
+        font-size: 20px;
+    }
+    .menu__bottom {
+        flex-direction: column;
+    }
+    .menu__left {
+        width: 100%;
+        height: unset;
+    }
+    .menu__form {
+        display: flex;
+        justify-content: space-between;
+    }
+    .menu__form input {
+        display: flex;
+        width: calc(70% - 5px);
+        margin: 0px;
+    }
+    .menu__form button {
+        justify-content: center;
+        align-items: center;
+        margin: 0px;
+        display: flex;
+        width: calc(30% - 5px);
+    }
+    #gamestart {
+        margin-top: 20px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .menu__right {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        overflow-y: hidden;
+        box-sizing: border-box;
+    }
+    .game__menu {
+        height: 100%;
+    }
+    .page.learn {
+        width: 100%;
+        height: 100%;
+        background-size: 80%;
+        box-sizing: border-box;
+        background-position-x: center;
+        box-sizing: border-box;
+    }
+    .menu__header h2 {
+        font-size: 25px;
+        padding-left: 0px;
+    }
+}
+@media (max-width: 600px) {
+    .leaderboard {
+        width: 100%;
+        min-height: 0px;
+        height: 150px;
+        overflow-y: scroll;
+        padding: 15px;
+    }
+    .leaderboard ul {
+        margin-top: 10px;
+        margin-bottom: 0px;
+    }
+}
