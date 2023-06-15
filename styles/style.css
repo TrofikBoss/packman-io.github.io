@@ -50,6 +50,10 @@ body {
     position: absolute;
     filter: drop-shadow(0px 0px 3px aqua);
 }
+.drop.type-ultra {
+    background-color: white;
+    transform: scale(1.2);
+}
 .game__border {
     position: absolute;
     border: 10px dotted red;
@@ -182,14 +186,15 @@ body {
 }
 @media (max-width: 800px) {
     .leaderboard {
-        width: 208px;
-        min-height: 355px;
+        width: 150px;
+        min-height: 300px;
+        padding: 10px;
     }
     .leaderboard li {
-        font-size: 17px;
+        font-size: 13px;
     }
     .leaderboard h2 {
-        font-size: 20px;
+        font-size: 15px;
     }
     .menu__bottom {
         flex-direction: column;

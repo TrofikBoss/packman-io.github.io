@@ -109,8 +109,13 @@ class Packman {
         for (let x = 0; x < drops.length; x++) {
             if (drops[x]) {
                 if(checkbox(this.posx, this.posy, this.size / 2, drops[x].posx, drops[x].posy, 20) == true) {
-                    this.size += 1;
-                    this.score += 1;
+                    if (drops[x].type == "ultra") {
+                        this.size += 10;
+                        this.score += 10;
+                    } else {
+                        this.size += 1;
+                        this.score += 1;
+                    }
                     let elem = document.querySelector(`.drop.id-${Number(x) + 1}`);
                     elem.parentNode.removeChild(elem);
                     delete drops[x];
@@ -158,13 +163,15 @@ class Packman {
         let goalid;
         let goaltype;
         let domove = false;
-        for (let x = 0; x < entity.length; x++) { // отслеживание добычи
-            if (ghosts[x] && this.size < 80) {
-                let length = getlength(this.posx, this.posy, ghosts[x].posx, ghosts[x].posy);
-                if (length < minlen && length < this.size * 4) {
-                    minlen = length;
-                    goaltype = "ghost";
-                    goalid = x;
+        if (this.size < 80) {
+            for (let x = 0; x < entity.length; x++) { // отслеживание добычи
+                if (ghosts[x]) {
+                    let length = getlength(this.posx, this.posy, ghosts[x].posx, ghosts[x].posy);
+                    if (length < minlen && length < this.size * 4) {
+                        minlen = length;
+                        goaltype = "ghost";
+                        goalid = x;
+                    }
                 }
             }
         }
@@ -197,12 +204,10 @@ class Packman {
         if (goaltype == "drop" && drops[goalid]) {
             this.goalx = drops[goalid].posx;
             this.goaly = drops[goalid].posy;
-        } 
-        if (goaltype == "bot" && entity[goalid]) {
+        } else if (goaltype == "bot" && entity[goalid]) {
             this.goalx = entity[goalid].posx;
             this.goaly = entity[goalid].posy;
-        }
-        if (goaltype == "ghost" && ghosts[goalid]) {
+        } else if (goaltype == "ghost" && ghosts[goalid]) {
             this.goalx = ghosts[goalid].posx;
             this.goaly = ghosts[goalid].posy;
         }
@@ -237,7 +242,6 @@ class Packman {
     update() {
         this.check_eat();
         let obj_this = document.querySelector(`.entity.id-${player.id}`);
-
         if (this.type == "Xplayer") {
             obj_this.style.left = `${document.body.clientWidth / 2 - player.size / 2}px`;
             obj_this.style.top = `${document.body.clientHeight / 2 - player.size / 2}px`;
@@ -246,9 +250,8 @@ class Packman {
             } else {
                 scale = 0.3;
             }
-
         }
-        this.speed = (1000 / this.size) + (500 / this.size);
+        this.speed = 1500 / this.size;
         if (this.type == "bot") {
             this.bot_behavior();
         }
@@ -261,6 +264,12 @@ class Drop {
         this.posy = Math.random() * (borderheight - 10) - (borderheight - 10) / 2;
         this.size = 20;
         this.id = id;
+        let randtype = Math.round(Math.random() * 20);
+        if (randtype == 1) {
+            this.type = "ultra";
+        } else {
+            this.type = "default";
+        }
     }
     update() {
         let obj_this = document.querySelector(`.drop.id-${this.id + 1}`);
@@ -302,55 +311,52 @@ function checkbox(x1, y1, size1, x2, y2, size2) {
         return true;
     }
 }
-
-function checkbuttons() {
-    document.body.addEventListener("keydown", function(k) {
-        if (k.key == "ArrowLeft") {
-            buttons.left = true;
-        }
-        if (k.key == "ArrowRight") {
-            buttons.right = true;
-        }
-        if (k.key == "ArrowUp") {
-            buttons.top = true;
-        }
-        if (k.key == "ArrowDown") {
-            buttons.bottom = true;
-        }
-    })
-    document.body.addEventListener("keyup", function(k) {
-        if (k.key == "ArrowLeft") {
-            buttons.left = false;
-        }
-        if (k.key == "ArrowRight") {
-            buttons.right = false;
-        }
-        if (k.key == "ArrowUp") {
-            buttons.top = false;
-        }
-        if (k.key == "ArrowDown") {
-            buttons.bottom = false;
-        }
-    })
-    if (buttons.left == false && buttons.right == false && buttons.top == false && buttons.bottom == false) {
-        sensorblock = false;
-    } else {
-        sensorblock = true;
+document.body.addEventListener("keydown", function(k) {
+    if (k.key == "ArrowLeft") {
+        buttons.left = true;
     }
-}
+    if (k.key == "ArrowRight") {
+        buttons.right = true;
+    }
+    if (k.key == "ArrowUp") {
+        buttons.top = true;
+    }
+    if (k.key == "ArrowDown") {
+        buttons.bottom = true;
+    }
+})
+document.body.addEventListener("keyup", function(k) {
+    if (k.key == "ArrowLeft") {
+        buttons.left = false;
+    }
+    if (k.key == "ArrowRight") {
+        buttons.right = false;
+    }
+    if (k.key == "ArrowUp") {
+        buttons.top = false;
+    }
+    if (k.key == "ArrowDown") {
+        buttons.bottom = false;
+    }
+})
 
 let downmouse = false;
 let sensorblock = false
 
 function checksensor() {
-    if (sensorblock == false && downmouse == true && gamestart == true) {
+    if (buttons.left == false && buttons.right == false && buttons.top == false && buttons.bottom == false) {
+        sensorblock = false;
+    } else {
+        sensorblock = true;
+    }
+    if (gamestart == true && downmouse == true && sensorblock == false) {
         let xcenter = document.body.clientWidth / 2; 
         let ycenter = document.body.clientHeight / 2; 
-        let ybust = Math.abs((ycenter - mouseY) / ycenter) * 3;
+        let ybust = Math.abs((ycenter - mouseY) / ycenter) * 4;
         if (ybust > 1) {
             ybust = 1;
         }
-        let xbust = Math.abs((xcenter - mouseX) / xcenter) * 3;
+        let xbust = Math.abs((xcenter - mouseX) / xcenter) * 4;
         if (xbust > 1) {
             xbust = 1;
         }
@@ -519,7 +525,6 @@ stopgame();
 
 function update() {
     if (gamestart == true) {
-        checkbuttons();
         movePlayer();
         checkentity();
         checksensor();
@@ -632,7 +637,7 @@ function dropgen() { // Генерация сфер
             drops[y] = new Drop(y);
         }
         let obj_drop = document.createElement("div");
-        obj_drop.classList.add('drop', `id-${y + 1}`)
+        obj_drop.classList.add('drop', `id-${y + 1}`, `type-${drops[y].type}`);
         document.querySelector(".game__area").append(obj_drop);
         document.querySelector(`.drop.id-${y + 1}`).style.left = `${drops[y].posx - drops[y].size / 2}px`;
         document.querySelector(`.drop.id-${y + 1}`).style.top = `${drops[y].posy - drops[y].size / 2}px`;
@@ -641,12 +646,20 @@ function dropgen() { // Генерация сфер
 
 function botgen() { // Генерация ботов
     if (gamestart == true) {
-        let obj_packman = document.createElement("div");
-        obj_packman.classList.add(`packman`, `bot`, `entity`, `id-${entity.length + 1}`);
-        document.querySelector(".game__area").append(obj_packman);
-        entity.push(new Packman(entity.length + 1, Math.random() * borderwidth - borderwidth / 2, Math.random() * borderheight - borderheight / 2, "bot", nickgen()));
-        document.querySelector(`.entity.id-${entity.length}`).style.left = `${entity[entity.length - 1].posx - entity[entity.length - 1].size / 2}px`;
-        document.querySelector(`.entity.id-${entity.length}`).style.top = `${entity[entity.length - 1].posy - entity[entity.length - 1].size / 2}px`;
+        let maxp = 0;
+        for (let x = 0; x < entity.length; x++) {
+            if (entity[x]) {
+                maxp++;
+            }
+        }
+        if (maxp < 15) {
+            let obj_packman = document.createElement("div");
+            obj_packman.classList.add(`packman`, `bot`, `entity`, `id-${entity.length + 1}`);
+            document.querySelector(".game__area").append(obj_packman);
+            entity.push(new Packman(entity.length + 1, Math.random() * borderwidth - borderwidth / 2, Math.random() * borderheight - borderheight / 2, "bot", nickgen()));
+            document.querySelector(`.entity.id-${entity.length}`).style.left = `${entity[entity.length - 1].posx - entity[entity.length - 1].size / 2}px`;
+            document.querySelector(`.entity.id-${entity.length}`).style.top = `${entity[entity.length - 1].posy - entity[entity.length - 1].size / 2}px`;
+        }
     }
 }
 
@@ -661,9 +674,9 @@ function ghostgen() { // Генерация призраков
     }
 }
 
-setInterval(botgen, 3000);
+setInterval(botgen, 4000);
 setInterval(update, 60);
-setInterval(dropgen, 100);
+setInterval(dropgen, 120);
 setInterval(ghostgen, 17000);
 
 document.querySelector("#gamestart").addEventListener("click", function() {
