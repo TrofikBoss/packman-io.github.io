@@ -334,31 +334,11 @@ function checkbuttons() {
         sensorblock = true;
     }
 }
-document.body.addEventListener("mouseup", function(click) {
-    downmouse = false;
-})
-
-document.body.addEventListener("mousedown", function(click) {
-    downmouse = true;
-    mouseX = click.clientX;
-    mouseY = click.clientY;
-})
-document.body.addEventListener("mousemove", function(move) {
-    mouseX = move.clientX;
-    mouseY = move.clientY;
-})
-document.body.addEventListener("touchmove", function(move) {
-    downmouse = true;
-    console.log(move.touches[0].screenX);
-    mouseX = move.touches[0].screenX;
-    mouseY = move.touches[0].screenY;
-})
 
 let downmouse = false;
 let sensorblock = false
 
 function checksensor() {
-    //console.log(downmouse + " " + gamestart);
     if (sensorblock == false && downmouse == true && gamestart == true) {
         let xcenter = document.body.clientWidth / 2; 
         let ycenter = document.body.clientHeight / 2; 
@@ -469,6 +449,29 @@ function gamecontainer_control() {
     document.querySelector(".game__area").style.left = `${offsetX}px`;
     document.querySelector(".game__area").style.top = `${offsetY}px`;
 }
+
+document.body.addEventListener("mouseup", function(click) {
+    downmouse = false;
+})
+
+document.body.addEventListener("mousedown", function(click) {
+    downmouse = true;
+    mouseX = click.clientX;
+    mouseY = click.clientY;
+})
+document.body.addEventListener("mousemove", function(move) {
+    mouseX = move.clientX;
+    mouseY = move.clientY;
+})
+document.querySelector("#game").addEventListener("touchmove", function(move) {
+    downmouse = true;
+    mouseX = move.touches[0].screenX;
+    mouseY = move.touches[0].screenY;
+})
+document.body.addEventListener("touchend", function(move) {
+    downmouse = false;
+})
+
 function startgame() {
     document.querySelector(".game__border, #player, .leaderboard").style.display = "flex";
     document.querySelector(".game__menu, .leave").style.display = "none";
@@ -594,7 +597,10 @@ function dropgen() { // Генерация сфер
         } else {
             drops[y] = new Drop(y);
         }
-        document.querySelector(".game__area").innerHTML += `<div class="drop id-${y + 1}"></div>`;
+        let obj_drop = document.createElement("div");
+        obj_drop.classList.add('drop', `id-${y + 1}`)
+        //document.querySelector(".game__area").innerHTML += `<div class="drop id-${y + 1}"></div>`;
+        document.querySelector(".game__area").append(obj_drop);
         document.querySelector(`.drop.id-${y + 1}`).style.left = `${drops[y].posx - drops[y].size / 2}px`;
         document.querySelector(`.drop.id-${y + 1}`).style.top = `${drops[y].posy - drops[y].size / 2}px`;
     }
@@ -602,7 +608,10 @@ function dropgen() { // Генерация сфер
 
 function botgen() { // Генерация ботов
     if (gamestart == true) {
-        document.querySelector(".game__area").innerHTML += `<div class="packman bot entity id-${entity.length + 1}"></div>`;
+        let obj_packman = document.createElement("div");
+        obj_packman.classList.add(`packman`, `bot`, `entity`, `id-${entity.length + 1}`);
+        document.querySelector(".game__area").append(obj_packman);
+        //document.querySelector(".game__area").innerHTML += `<div class="packman bot entity id-${entity.length + 1}"></div>`;
         entity.push(new Packman(entity.length + 1, Math.random() * borderwidth - borderwidth / 2, Math.random() * borderheight - borderheight / 2, "bot", nickgen()));
         document.querySelector(`.entity.id-${entity.length}`).style.left = `${entity[entity.length - 1].posx - entity[entity.length - 1].size / 2}px`;
         document.querySelector(`.entity.id-${entity.length}`).style.top = `${entity[entity.length - 1].posy - entity[entity.length - 1].size / 2}px`;
@@ -611,7 +620,10 @@ function botgen() { // Генерация ботов
 
 function ghostgen() { // Генерация призраков
     if (gamestart == true) {
-        document.querySelector(".game__area").innerHTML += `<div class="ghost id-${ghosts.length + 1}"></div>`;
+        let obj_ghost = document.createElement("div");
+        obj_ghost.classList.add("ghost", `id-${ghosts.length + 1}`);
+        //document.querySelector(".game__area").innerHTML += `<div class="ghost id-${ghosts.length + 1}"></div>`;
+        document.querySelector(".game__area").append(obj_ghost);
         ghosts.push(new Ghost());
         document.querySelector(`.ghost.id-${ghosts.length}`).style.left = `${ghosts[ghosts.length - 1].posx - ghosts[ghosts.length - 1].size / 2}px`;
         document.querySelector(`.ghost.id-${ghosts.length}`).style.top = `${ghosts[ghosts.length - 1].posy - ghosts[ghosts.length - 1].size / 2}px`;
