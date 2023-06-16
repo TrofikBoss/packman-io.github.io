@@ -156,6 +156,10 @@ class Packman {
             this_obj.style.width = `${this.size}px`;
             this_obj.style.height = `${this.size}px`;
             this_obj.style.fontSize = `${this.size / 2}px`;
+            if (this.type == "Xplayer") {
+                this_obj.style.left = `${(document.body.clientWidth - player.size) / 2}px`;
+                this_obj.style.top = `${(document.body.clientHeight - player.size) / 2}px`;
+            }
         }
     }
     bot_behavior() { // интеллект бота
@@ -175,7 +179,7 @@ class Packman {
                 }
             }
         }
-        if (!goaltype) {
+        if (!goaltype && this.size > 99) {
             minlen = Infinity;
             for (let x = 0; x < entity.length; x++) { // отслеживание добычи
                 if (entity[x] && entity[x].id != this.id) {
@@ -211,7 +215,7 @@ class Packman {
             this.goalx = ghosts[goalid].posx;
             this.goaly = ghosts[goalid].posy;
         }
-        if (Math.abs(this.goalx - this.posx) > this.speed && this.goalx != null) { // преследование добычи
+        if (this.goalx != null && Math.abs(this.goalx - this.posx) > this.speed) { // преследование добычи
             if (this.posx < this.goalx && this.posx + this.size / 2 - 10 < borderwidth / 2) {
                 this.posx += this.speed;
                 domove = true;
@@ -222,7 +226,7 @@ class Packman {
                 this.goalx = null;
             }
         }
-        if (Math.abs(this.goaly - this.posy) > this.speed && this.goaly != null) {
+        if (this.goaly != null && Math.abs(this.goaly - this.posy) > this.speed) {
             if (this.posy < this.goaly && this.posy + this.size / 2 - 10 < borderheight / 2) {
                 this.posy += this.speed;
                 domove = true;
@@ -241,17 +245,14 @@ class Packman {
     }
     update() {
         this.check_eat();
-        let obj_this = document.querySelector(`.entity.id-${player.id}`);
         if (this.type == "Xplayer") {
-            obj_this.style.left = `${document.body.clientWidth / 2 - player.size / 2}px`;
-            obj_this.style.top = `${document.body.clientHeight / 2 - player.size / 2}px`;
             if (this.size < 1201) {
-                scale = 1 - ((0.7 / 1150) * this.size);
+                scale = 1 - (0.0006 * this.size);
             } else {
                 scale = 0.3;
             }
         }
-        this.speed = 1500 / this.size;
+        this.speed = 1000 / this.size;
         if (this.type == "bot") {
             this.bot_behavior();
         }
@@ -273,11 +274,11 @@ class Drop {
     }
     update() {
         let obj_this = document.querySelector(`.drop.id-${this.id + 1}`);
-        obj_this.style.left = `${this.posx - this.size / 2}px`;
-        obj_this.style.top = `${this.posy - this.size / 2}px`;
-        obj_this.style.width = `${this.size}px`;
-        obj_this.style.height = `${this.size}px`;
-        this.size -= 0.1;
+        this.size -= 0.08;
+        if (Math.round(this.size) % 3 == 0) {
+            obj_this.style.width = `${this.size}px`;
+            obj_this.style.height = `${this.size}px`;
+        }
         if (this.size < 5) {
             obj_this.parentNode.removeChild(obj_this);
             delete drops[this.id];
@@ -300,6 +301,8 @@ let gamestart = false;
 let playerlive = true;
 let mouseX = 1000;
 let mouseY = 1000;
+let clWidth = document.body.clientWidth;
+let clHeight = document.body.clientHeight;
 //new Packman(2, 100, 100, "bot", "TestUser")
 
 function getlength(x1, y1, x2, y2) {
@@ -424,8 +427,8 @@ function movePlayer() {
         player.posy += player.speed;
     } 
 
-    offsetX = (document.body.clientWidth / 2) - player.posx;
-    offsetY = (document.body.clientHeight / 2) - player.posy;
+    offsetX = (clWidth / 2) - player.posx;
+    offsetY = (clHeight / 2) - player.posy;
 }
 
 function leaderboard_update() {
@@ -460,9 +463,8 @@ function leaderboard_update() {
         obj_ul.append(obj_li);
     }
     obj_li = document.createElement("li");
+    obj_li.classList.add("thisplayer");
     obj_li.textContent = `${player.name} - ${Math.round(player.size)} силы. Всего ${Math.round(player.score)} очков`;
-    obj_li.style.borderTop = "2px solid white";
-    obj_li.style.paddingTop = "10px";
     obj_ul.append(obj_li);
     //resultul += `<li style="border-top: 2px solid white; padding-top: 10px">${player.name} - ${Math.round(player.size)} силы. <br>Всего ${Math.round(player.score)} очков</li>`
     //document.querySelector(".leaderboard ul").innerHTML = resultul;
@@ -706,10 +708,14 @@ function ghostgen() { // Генерация призраков
 }
 
 setInterval(botgen, 4000);
-setInterval(update, 60);
+setInterval(update, 40);
 setInterval(dropgen, 120);
 setInterval(ghostgen, 17000);
 
+window.addEventListener("resize", function() {
+    clWidth = document.body.clientWidth;
+    clHeight = document.body.clientHeight;
+})
 document.querySelector("#gamestart").addEventListener("click", function() {
     gamestart = true;
     document.querySelector(".game__container").innerHTML += '<div class="packman player entity id-1" id="player"></div>';
