@@ -343,6 +343,8 @@ document.body.addEventListener("keyup", function(k) {
 let downmouse = false;
 let sensorblock = false
 let cursorposset = false;
+let touchpointx;
+let touchpointy;
 let xcenter;
 let ycenter;
 
@@ -352,19 +354,21 @@ function checksensor() {
     } else {
         sensorblock = true;
     }
-    if (cursorposset == false && downmouse == true ) {
+    if (cursorposset == false && downmouse == true) {
         xcenter = mouseX;
         ycenter = mouseY;
+        let obj_point = document.querySelector(".touchpoint");
+        obj_point.style.left = `${mouseX - 15}px`;
+        obj_point.style.top = `${mouseY - 15}px`;
+        obj_point.style.display = "flex";
         cursorposset = true; 
     }
     if (gamestart == true && cursorposset == true && downmouse == true && sensorblock == false) {
-        xcenter = xcenter + (mouseX - xcenter) / 500;
-        ycenter = ycenter + (mouseY - ycenter) / 500;
-        let ybust = Math.abs((ycenter - mouseY) / ycenter) * 4;
+        let ybust = Math.abs((ycenter - mouseY) / ycenter) * 5;
         if (ybust > 1) {
             ybust = 1;
         }
-        let xbust = Math.abs((xcenter - mouseX) / xcenter) * 4;
+        let xbust = Math.abs((xcenter - mouseX) / xcenter) * 5;
         if (xbust > 1) {
             xbust = 1;
         }
@@ -482,6 +486,7 @@ function gamecontainer_control() {
 document.body.addEventListener("mouseup", function(click) {
     downmouse = false;
     cursorposset = false;
+    document.querySelector(".touchpoint").style.display = "none";
 })
 
 document.body.addEventListener("mousedown", function(click) {
@@ -501,6 +506,7 @@ document.querySelector("#game").addEventListener("touchmove", function(move) {
 document.body.addEventListener("touchend", function(move) {
     downmouse = false;
     cursorposset = false;
+    document.querySelector(".touchpoint").style.display = "none";
 })
 
 let audioobrez = [1, 0]; // обрезание аудио, если нужно
@@ -664,8 +670,8 @@ function dropgen() { // Генерация сфер
         let obj_drop = document.createElement("div");
         obj_drop.classList.add('drop', `id-${y + 1}`, `type-${drops[y].type}`);
         document.querySelector(".game__area").append(obj_drop);
-        document.querySelector(`.drop.id-${y + 1}`).style.left = `${drops[y].posx - drops[y].size / 2}px`;
-        document.querySelector(`.drop.id-${y + 1}`).style.top = `${drops[y].posy - drops[y].size / 2}px`;
+        obj_drop.style.left = `${drops[y].posx - drops[y].size / 2}px`;
+        obj_drop.style.top = `${drops[y].posy - drops[y].size / 2}px`;
     }
 }
 
@@ -682,8 +688,8 @@ function botgen() { // Генерация ботов
             obj_packman.classList.add(`packman`, `bot`, `entity`, `id-${entity.length + 1}`);
             document.querySelector(".game__area").append(obj_packman);
             entity.push(new Packman(entity.length + 1, Math.random() * borderwidth - borderwidth / 2, Math.random() * borderheight - borderheight / 2, "bot", nickgen()));
-            document.querySelector(`.entity.id-${entity.length}`).style.left = `${entity[entity.length - 1].posx - entity[entity.length - 1].size / 2}px`;
-            document.querySelector(`.entity.id-${entity.length}`).style.top = `${entity[entity.length - 1].posy - entity[entity.length - 1].size / 2}px`;
+            obj_packman.style.left = `${entity[entity.length - 1].posx - entity[entity.length - 1].size / 2}px`;
+            obj_packman.style.top = `${entity[entity.length - 1].posy - entity[entity.length - 1].size / 2}px`;
         }
     }
 }
@@ -694,8 +700,8 @@ function ghostgen() { // Генерация призраков
         obj_ghost.classList.add("ghost", `id-${ghosts.length + 1}`);
         document.querySelector(".game__area").append(obj_ghost);
         ghosts.push(new Ghost());
-        document.querySelector(`.ghost.id-${ghosts.length}`).style.left = `${ghosts[ghosts.length - 1].posx - ghosts[ghosts.length - 1].size / 2}px`;
-        document.querySelector(`.ghost.id-${ghosts.length}`).style.top = `${ghosts[ghosts.length - 1].posy - ghosts[ghosts.length - 1].size / 2}px`;
+        obj_ghost.style.left = `${ghosts[ghosts.length - 1].posx - ghosts[ghosts.length - 1].size / 2}px`;
+        obj_ghost.style.top = `${ghosts[ghosts.length - 1].posy - ghosts[ghosts.length - 1].size / 2}px`;
     }
 }
 
@@ -722,6 +728,9 @@ document.querySelector("#leave").addEventListener("click", function() {
     drops = [];
     ghosts = [];
     stopgame();
+})
+document.addEventListener("keydown", function(e) {
+    e.preventDefault();
 })
 document.querySelector("#name").addEventListener("keydown", function(a) {
     if (gamestart == false && a.key == "Enter") {
