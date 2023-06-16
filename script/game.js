@@ -730,7 +730,9 @@ document.querySelector("#leave").addEventListener("click", function() {
     stopgame();
 })
 document.addEventListener("keydown", function(e) {
-    e.preventDefault();
+    if (e.key == "ArrowUp" || e.key == "ArrowDown") {
+        e.preventDefault();
+    }
 })
 document.querySelector("#name").addEventListener("keydown", function(a) {
     if (gamestart == false && a.key == "Enter") {
