@@ -342,6 +342,9 @@ document.body.addEventListener("keyup", function(k) {
 
 let downmouse = false;
 let sensorblock = false
+let cursorposset = false;
+let xcenter;
+let ycenter;
 
 function checksensor() {
     if (buttons.left == false && buttons.right == false && buttons.top == false && buttons.bottom == false) {
@@ -349,9 +352,14 @@ function checksensor() {
     } else {
         sensorblock = true;
     }
-    if (gamestart == true && downmouse == true && sensorblock == false) {
-        let xcenter = document.body.clientWidth / 2; 
-        let ycenter = document.body.clientHeight / 2; 
+    if (cursorposset == false && downmouse == true ) {
+        xcenter = mouseX;
+        ycenter = mouseY;
+        cursorposset = true; 
+    }
+    if (gamestart == true && cursorposset == true && downmouse == true && sensorblock == false) {
+        xcenter = xcenter + (mouseX - xcenter) / 500;
+        ycenter = ycenter + (mouseY - ycenter) / 500;
         let ybust = Math.abs((ycenter - mouseY) / ycenter) * 4;
         if (ybust > 1) {
             ybust = 1;
@@ -437,12 +445,23 @@ function leaderboard_update() {
         finalmas[y] = mas[thisid];
         delete mas[thisid];
     }
-    let resultul = "";
+    let obj_ul = document.querySelector(".leaderboard ul");
+    document.querySelectorAll(".leaderboard ul li").forEach(function(obj_l) {
+        obj_ul.removeChild(obj_l);
+    })
+    let obj_li;
     for (let x = 0; x < 6 && x < finalmas.length; x++) {
-        resultul += `<li>${finalmas[x].name} - ${Math.round(finalmas[x].size)} [${Math.round(finalmas[x].score)}]</li>`;
+        obj_li = document.createElement("li");
+        obj_li.textContent = `${finalmas[x].name} - ${Math.round(finalmas[x].size)} [${Math.round(finalmas[x].score)}]`
+        obj_ul.append(obj_li);
     }
-    resultul += `<li style="border-top: 2px solid white; padding-top: 10px">${player.name} - ${Math.round(player.size)} силы. <br>Всего ${Math.round(player.score)} очков</li>`
-    document.querySelector(".leaderboard ul").innerHTML = resultul;
+    obj_li = document.createElement("li");
+    obj_li.textContent = `${player.name} - ${Math.round(player.size)} силы. Всего ${Math.round(player.score)} очков`;
+    obj_li.style.borderTop = "2px solid white";
+    obj_li.style.paddingTop = "10px";
+    obj_ul.append(obj_li);
+    //resultul += `<li style="border-top: 2px solid white; padding-top: 10px">${player.name} - ${Math.round(player.size)} силы. <br>Всего ${Math.round(player.score)} очков</li>`
+    //document.querySelector(".leaderboard ul").innerHTML = resultul;
 }
 
 function border_control() {
@@ -462,6 +481,7 @@ function gamecontainer_control() {
 
 document.body.addEventListener("mouseup", function(click) {
     downmouse = false;
+    cursorposset = false;
 })
 
 document.body.addEventListener("mousedown", function(click) {
@@ -480,7 +500,10 @@ document.querySelector("#game").addEventListener("touchmove", function(move) {
 })
 document.body.addEventListener("touchend", function(move) {
     downmouse = false;
+    cursorposset = false;
 })
+
+let audioobrez = [1, 0]; // обрезание аудио, если нужно
 
 function startgame() {
     document.querySelector(".game__border, #player, .leaderboard").style.display = "flex";
@@ -490,7 +513,9 @@ function startgame() {
     border_control();
     if (audioactive == false) {
         audio1.play();
+        audio1.volume = 0.7;
         audioactive = true;
+        audio1.currentTime = audioobrez[0];
     }
 }
 function getRandTitle() {
@@ -675,7 +700,7 @@ function ghostgen() { // Генерация призраков
 }
 
 setInterval(botgen, 4000);
-setInterval(update, 60);
+setInterval(update, 80);
 setInterval(dropgen, 120);
 setInterval(ghostgen, 17000);
 
