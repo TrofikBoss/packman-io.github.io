@@ -700,7 +700,7 @@ function ghostgen() { // Генерация призраков
 }
 
 setInterval(botgen, 4000);
-setInterval(update, 80);
+setInterval(update, 60);
 setInterval(dropgen, 120);
 setInterval(ghostgen, 17000);
 
