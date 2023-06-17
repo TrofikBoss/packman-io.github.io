@@ -170,6 +170,43 @@ body {
     justify-content: space-between;
     max-width: 100%;
 }
+.menu__vk {
+    margin-top: 15px;
+}
+.vk__button {
+    display: flex;
+    width: calc(100% / 2 - 10px);
+    min-height: 30px;
+    height: 100%;
+    padding: unset;
+    justify-content: space-between;
+    flex-direction: row;
+    font-size: 15px;
+}
+.vk__button__left {
+    display: flex;
+    width: 10px;
+    height: 100%;
+    background-color: gray;
+    border-right: 3px solid rgb(0, 126, 222);
+}
+.vk__button p {
+    margin: 0px;
+}
+.vk__button__left.active {
+    background-color: lime;
+}
+.vk__sub .vk__button__right {
+    background-image: url(../textures/images/vksub.png);
+}
+.vk__button__right {
+    width: 100%;
+    padding: 10px 10px 10px 40px;
+    background-size: 30px;
+    background-repeat: no-repeat;
+    background-position: 5px center;
+    image-rendering: pixelated;
+}
 .menu__left {
     height: 100%;
     width: fit-content;

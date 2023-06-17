@@ -15,9 +15,7 @@ class Ghost {
                 if (entity[x].size > 80) {
                     if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2) == true) {
                         entity[x].size -= 4;
-                        document.querySelector(`.entity.id-${entity[x].id}`).style.width = `${entity[x].size}px`;
-                        document.querySelector(`.entity.id-${entity[x].id}`).style.height = `${entity[x].size}px`;
-                        document.querySelector(`.entity.id-${entity[x].id}`).style.fontSize = `${entity[x].size / 2}px`;
+                        document.querySelector(`.entity.id-${entity[x].id}`).style.transform = `scale(${entity[x].size / 50})`;
                         if (entity[x].size < 100) {
                             entity[x].size = 0;
                             delete entity[x];
@@ -152,13 +150,11 @@ class Packman {
             }
         }
         if (doeat == true) {
-            let this_obj = document.querySelector(`.entity.id-${this.id}`)
-            this_obj.style.width = `${this.size}px`;
-            this_obj.style.height = `${this.size}px`;
-            this_obj.style.fontSize = `${this.size / 2}px`;
+            let this_obj = document.querySelector(`.entity.id-${this.id}`);
+            this_obj.style.transform = `scale(${this.size / 50})`;
             if (this.type == "Xplayer") {
-                this_obj.style.left = `${(document.body.clientWidth - player.size) / 2}px`;
-                this_obj.style.top = `${(document.body.clientHeight - player.size) / 2}px`;
+                this_obj.style.left = `${(document.body.clientWidth / 2) - 25}px`;
+                this_obj.style.top = `${(document.body.clientHeight / 2) - 25}px`;
             }
         }
     }
@@ -276,8 +272,7 @@ class Drop {
         let obj_this = document.querySelector(`.drop.id-${this.id + 1}`);
         this.size -= 0.08;
         if (Math.round(this.size) % 3 == 0) {
-            obj_this.style.width = `${this.size}px`;
-            obj_this.style.height = `${this.size}px`;
+            obj_this.style.transform = `scale(${this.size / 20})`;
         }
         if (this.size < 5) {
             obj_this.parentNode.removeChild(obj_this);
@@ -453,7 +448,7 @@ function leaderboard_update() {
         delete mas[thisid];
     }
     let obj_ul = document.querySelector(".leaderboard ul");
-    document.querySelectorAll(".leaderboard ul li").forEach(function(obj_l) {
+    obj_ul.querySelectorAll("li").forEach(function(obj_l) {
         obj_ul.removeChild(obj_l);
     })
     let obj_li;
@@ -557,15 +552,12 @@ function stopgame() {
 stopgame();
 
 function update() {
-    if (gamestart == true) {
+    if (gamestart) {
         movePlayer();
         checkentity();
         checksensor();
         leaderboard_update();
         gamecontainer_control();
-        if (audio1.currentTime == audio1.duration) {
-            audio1.play();
-        }
     }
     if (playerlive == false && gamestart == true) {
         document.querySelector(".leave").style.display = "flex";
@@ -707,7 +699,12 @@ function ghostgen() { // Генерация призраков
     }
 }
 
-setInterval(botgen, 4000);
+setInterval(() => {
+    botgen();
+    if (audio1.currentTime == audio1.duration) {
+        audio1.play();
+    }
+}, 5000);
 setInterval(update, 40);
 setInterval(dropgen, 120);
 setInterval(ghostgen, 17000);
@@ -745,3 +742,16 @@ document.querySelector("#name").addEventListener("keydown", function(a) {
         changename = document.querySelector('#name').value;
     }
 })
+
+function vksub() {
+    vkBridge.send("VKWebAppJoinGroup", {group_id: 217181628})
+    .then((data) => { 
+      if (data.result) {
+        document.querySelector(".vk__sub .vk__button__left").classList.add("active");
+      }
+    })
+    .catch((error) => {
+      // Ошибка
+      document.querySelector(".vk__sub .vk__button__left").classList.remove("active");
+    }); 
+}
