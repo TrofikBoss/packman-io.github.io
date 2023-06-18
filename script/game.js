@@ -153,8 +153,8 @@ class Packman {
             let this_obj = document.querySelector(`.entity.id-${this.id}`);
             this_obj.style.transform = `scale(${this.size / 50})`;
             if (this.type == "Xplayer") {
-                this_obj.style.left = `${(document.body.clientWidth / 2) - 25}px`;
-                this_obj.style.top = `${(document.body.clientHeight / 2) - 25}px`;
+                //this_obj.style.left = `${(document.body.clientWidth / 2) - 25}px`;
+                //this_obj.style.top = `${(document.body.clientHeight / 2) - 25}px`;
             }
         }
     }
@@ -512,7 +512,7 @@ function startgame() {
     document.querySelector(".game__border, #player, .leaderboard").style.display = "flex";
     document.querySelector(".game__menu, .leave").style.display = "none";
     document.querySelector(`.entity.id-${player.id}`).style.left = `${document.body.clientWidth / 2 - player.size / 2}px`;
-        document.querySelector(`.entity.id-${player.id}`).style.top = `${document.body.clientHeight / 2 - player.size / 2}px`;
+    document.querySelector(`.entity.id-${player.id}`).style.top = `${document.body.clientHeight / 2 - player.size / 2}px`;
     border_control();
     if (audioactive == false) {
         audio1.play();
@@ -709,10 +709,18 @@ setInterval(update, 40);
 setInterval(dropgen, 120);
 setInterval(ghostgen, 17000);
 
-window.addEventListener("resize", function() {
+function displaymove() {
     clWidth = document.body.clientWidth;
     clHeight = document.body.clientHeight;
+    let obj_pl = document.querySelector("#player");
+    obj_pl.style.left = clWidth / 2 - 25 + "px";
+    obj_pl.style.top = clHeight / 2 - 25 + "px";
+}
+
+window.addEventListener("resize", function() {
+    displaymove()
 })
+
 document.querySelector("#gamestart").addEventListener("click", function() {
     gamestart = true;
     document.querySelector(".game__container").innerHTML += '<div class="packman player entity id-1" id="player"></div>';
@@ -754,4 +762,8 @@ function vksub() {
       // Ошибка
       document.querySelector(".vk__sub .vk__button__left").classList.remove("active");
     }); 
+}
+function vksend() {
+    vkBridge.send('VKWebAppShare', {link: 'https://vk.com/app51676673'});
+    document.querySelector(".vk__send .vk__button__left").classList.add("active");
 }

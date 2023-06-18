@@ -5,7 +5,7 @@ body {
     margin: 0px;
     max-height: 100vh;
     max-width: 100%;
-
+    overflow: hidden;
 }
 #game {
     width: 100%;
@@ -18,6 +18,9 @@ body {
     background-size: 400px;
     position: relative;
     transition: 0.1s;
+    display: flex;
+}
+#player {
     display: flex;
 }
 .entity {
@@ -172,6 +175,8 @@ body {
 }
 .menu__vk {
     margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
 }
 .vk__button {
     display: flex;
@@ -185,7 +190,7 @@ body {
 }
 .vk__button__left {
     display: flex;
-    width: 10px;
+    min-width: 10px;
     height: 100%;
     background-color: gray;
     border-right: 3px solid rgb(0, 126, 222);
@@ -198,6 +203,9 @@ body {
 }
 .vk__sub .vk__button__right {
     background-image: url(../textures/images/vksub.png);
+}
+.vk__send .vk__button__right {
+    background-image: url(../textures/images/vksend.png);
 }
 .vk__button__right {
     width: 100%;
@@ -311,5 +319,11 @@ body {
     .leaderboard ul {
         margin-top: 10px;
         margin-bottom: 0px;
+    }
+    .vk__button {
+        font-size: 12px;
+    }
+    .game__menu {
+        padding: 20px;
     }
 }
