@@ -763,7 +763,7 @@ function vksub() {
       document.querySelector(".vk__sub .vk__button__left").classList.remove("active");
     }); 
 }
-function vksend() {
+function vkshar() {
     vkBridge.send('VKWebAppShare', {link: 'https://vk.com/app51676673'});
     document.querySelector(".vk__send .vk__button__left").classList.add("active");
 }
