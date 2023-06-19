@@ -11,15 +11,19 @@ class Ghost {
     }
     check_eat() {
         for (let x = 0; x < entity.length; x++) {
-            if (entity[x]) {
+            if (entity[x] && entity[x].isghost == false) {
                 if (entity[x].size > 80) {
                     if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2) == true) {
-                        entity[x].size -= 4;
-                        document.querySelector(`.entity.id-${entity[x].id}`).style.transform = `scale(${entity[x].size / 50})`;
                         if (entity[x].size < 100) {
-                            entity[x].size = 0;
-                            delete entity[x];
-                            document.querySelector(`.entity.id-${Number(x) + 1}`).outerHTML = "";
+                            entity[x].size = 81;
+                            entity[x].isghost = true;
+                            entity[x].become_ghost();
+                            entity[x].viewupdate();
+                        } else {
+                            entity[x].size -= 1.5;
+                            if (Math.round(entity[x].size) % 4 == 0) {
+                                entity[x].viewupdate();
+                            }
                         }
                     }
                 }
@@ -30,7 +34,7 @@ class Ghost {
         let minlen = Infinity; // переменные
         let goalid;
         for (let x = 0; x < entity.length; x++) { // отслеживание добычи
-            if (entity[x] && entity[x].size > 80) {
+            if (entity[x] && entity[x].isghost == false && entity[x].size > 80) {
                 let length = getlength(this.posx, this.posy, entity[x].posx, entity[x].posy);
                 if (length < minlen && length < 1500) {
                     minlen = length;
@@ -81,7 +85,7 @@ class Ghost {
 }
 
 class Packman {
-    constructor(id, posx, posy, type = "bot", name) {
+    constructor(id, posx, posy, type = "bot", name, isghost = false) {
         this.id = id;
         this.posx = posx;
         this.posy = posy;
@@ -89,7 +93,14 @@ class Packman {
         this.size = 50;
         this.score = 0;
         this.type = type;
-        document.querySelector(`.entity.id-${this.id}`).style.filter = `hue-rotate(${Math.random() * 55 - 40}deg) drop-shadow(0px 0px 5px rgba(255, 166, 0, 0.7))`;
+        this.isghost = isghost;
+        if (isghost == true) {
+            document.querySelector(`.entity.id-${this.id}`).classList.add("packman__ghost");
+            document.querySelector(`.entity.id-${this.id}`).style.filter = `drop-shadow(0px 0px 5px rgb(67, 208, 255))`;
+        } else {
+            document.querySelector(`.entity.id-${this.id}`).style.filter = `hue-rotate(${Math.random() * 55 - 40}deg) drop-shadow(0px 0px 5px rgba(255, 166, 0, 0.7))`;
+            //document.querySelector(`.entity.id-${this.id}`).style.filter = `drop-shadow(0px 0px 5px rgba(0px 0px 3px aqua))`;
+        }
         if (type == "player" || type == "Xplayer") {
             this.obj = document.querySelector(`.player.id-${this.id}`);
         } else if (type == "bot") {
@@ -102,59 +113,115 @@ class Packman {
             document.querySelector(`.entity.id-${id}`).innerHTML = `<p>${this.name}</p>`;
         }
     }
+    viewupdate() {
+        document.querySelector(`.entity.id-${this.id}`).style.transform = `scale(${this.size / 50})`;
+        if (this.type == "Xplayer") {
+            if (this.size < 1201) {
+                scale = 1 - (0.0006 * this.size);
+            } else {
+                scale = 0.3;
+            }
+        }
+        if (!this.isghost) {
+            this.speed = 1000 / this.size;
+        } else {
+            this.speed = 750 / this.size;
+        }
+    }
+    become_ghost() {
+        document.querySelector(`.entity.id-${this.id}`).classList.add("packman__ghost");
+        document.querySelector(`.entity.id-${this.id}`).style.filter = `drop-shadow(0px 0px 5px rgb(67, 208, 255))`;
+        this.size = 81;
+        this.isghost = true;
+        this.viewupdate();
+    }
     check_eat() {
-        let doeat = false;
-        for (let x = 0; x < drops.length; x++) {
-            if (drops[x]) {
-                if(checkbox(this.posx, this.posy, this.size / 2, drops[x].posx, drops[x].posy, 20) == true) {
-                    if (drops[x].type == "ultra") {
-                        this.size += 10;
-                        this.score += 10;
-                    } else {
-                        this.size += 1;
-                        this.score += 1;
+        if (this.isghost == false) {
+            for (let x = 0; x < drops.length; x++) {
+                if (drops[x]) {
+                    if(checkbox(this.posx, this.posy, this.size / 2, drops[x].posx, drops[x].posy, 20) == true) {
+                        if (drops[x].type == "mega") {
+                            this.size += 30;
+                            this.score += 30;
+                        } else if (drops[x].type == "ultra") {
+                            this.size += 10;
+                            this.score += 10;
+                        } else {
+                            this.size += 1;
+                            this.score += 1;
+                        }
+                        let elem = document.querySelector(`.drop.id-${Number(x) + 1}`);
+                        elem.parentNode.removeChild(elem);
+                        delete drops[x];
+                        this.viewupdate();
                     }
-                    let elem = document.querySelector(`.drop.id-${Number(x) + 1}`);
-                    elem.parentNode.removeChild(elem);
-                    delete drops[x];
-                    doeat = true;
                 }
             }
         }
         for (let x = 0; x < entity.length; x++) {
             if (entity[x]) {
-                if (entity[x].id != this.id && this.size > entity[x].size + 10) {
-                    if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2) == true) {
-                        this.size += entity[x].size / 1.5;
-                        this.score += entity[x].size / 1.5;
-                        let elem = document.querySelector(`.entity.id-${Number(x) + 1}`);
-                        elem.parentNode.removeChild(elem);
-                        delete entity[x];
-                        doeat = true;
+                if (this.isghost) { 
+                    if (entity[x].id != this.id && entity[x].isghost == false && this.size < entity[x].size - 3) {
+                        if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2) == true) {
+                            if (this.size + 7 > entity[x].size) {
+                                entity[x].become_ghost();
+                            } else {
+                                entity[x].size -= 1.5;
+                                this.size += 1.5;
+                                this.score += 1.5;
+                                if (Math.round(this.size) % 4 == 0) {
+                                    this.viewupdate();
+                                    entity[x].viewupdate();
+                                }
+                            }
+                        }
+                    } else if (entity[x].id != this.id && entity[x].isghost == true && this.size - 10 > entity[x].size && entity[x].size > 82) {
+                        if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2) == true) {
+                            this.size += entity[x].size / 1.5;
+                            this.score += entity[x].size / 1.5;
+                            let elem = document.querySelector(`.entity.id-${Number(x) + 1}`);
+                            elem.parentNode.removeChild(elem);
+                            delete entity[x];
+                            this.viewupdate();
+                        }
+                    }
+                } else {
+                    if (entity[x].id != this.id && entity[x].isghost == false && this.size > entity[x].size + 10) {
+                        if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2) == true) {
+                            this.size += entity[x].size / 1.5;
+                            this.score += entity[x].size / 1.5;
+                            let elem = document.querySelector(`.entity.id-${Number(x) + 1}`);
+                            elem.parentNode.removeChild(elem);
+                            delete entity[x];
+                            this.viewupdate();
+                        }
+                    } else {
+                        if (entity[x].id != this.id && entity[x].isghost == true && this.size < entity[x].size) {
+                            if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2) == true) {
+                                this.size += entity[x].size / 1.5;
+                                this.score += entity[x].size / 1.5;
+                                let elem = document.querySelector(`.entity.id-${Number(x) + 1}`);
+                                elem.parentNode.removeChild(elem);
+                                delete entity[x];
+                                this.viewupdate();
+                            }
+                        } 
                     }
                 }
             }
         }
         for (let x = 0; x < ghosts.length; x++) {
             if (ghosts[x]) {
-                if (this.size < 81) {
+                if ((this.isghost == false && this.size < 81) || (this.isghost == true && this.size > 100)) {
                     if(checkbox(this.posx, this.posy, this.size / 2, ghosts[x].posx, ghosts[x].posy, ghosts[x].size / 2) == true) {
                         this.size += 25;
                         this.score += 25;
                         let elem = document.querySelector(`.ghost.id-${Number(x) + 1}`);
                         elem.parentNode.removeChild(elem);
                         delete ghosts[x];
-                        doeat = true;
+                        this.viewupdate();
                     }
                 }
-            }
-        }
-        if (doeat == true) {
-            let this_obj = document.querySelector(`.entity.id-${this.id}`);
-            this_obj.style.transform = `scale(${this.size / 50})`;
-            if (this.type == "Xplayer") {
-                //this_obj.style.left = `${(document.body.clientWidth / 2) - 25}px`;
-                //this_obj.style.top = `${(document.body.clientHeight / 2) - 25}px`;
             }
         }
     }
@@ -163,32 +230,55 @@ class Packman {
         let goalid;
         let goaltype;
         let domove = false;
-        if (this.size < 80) {
+        if ((this.size < 81 && this.isghost == false) || (this.size > 100 && this.isghost == true)) {
             for (let x = 0; x < entity.length; x++) { // отслеживание добычи
                 if (ghosts[x]) {
                     let length = getlength(this.posx, this.posy, ghosts[x].posx, ghosts[x].posy);
                     if (length < minlen && length < this.size * 4) {
                         minlen = length;
                         goaltype = "ghost";
-                        goalid = x;
-                    }
-                }
-            }
-        }
-        if (!goaltype && this.size > 99) {
-            minlen = Infinity;
-            for (let x = 0; x < entity.length; x++) { // отслеживание добычи
-                if (entity[x] && entity[x].id != this.id) {
-                    let length = getlength(this.posx, this.posy, entity[x].posx, entity[x].posy);
-                    if (length < minlen && entity[x].size + 10 < this.size && length < this.size * 4) {
-                        minlen = length;
-                        goaltype = "bot";
-                        goalid = x;
+                        this.goalx = ghosts[x].posx;
+                        this.goaly = ghosts[x].posy;
                     }
                 }
             }
         }
         if (!goaltype) {
+            minlen = Infinity;
+            for (let x = 0; x < entity.length; x++) { // отслеживание добычи
+                if (entity[x] && entity[x].id != this.id) {
+                    let length = getlength(this.posx, this.posy, entity[x].posx, entity[x].posy);
+                    if (length < minlen && length < this.size * 6) {
+                        if (this.isghost == true) {
+                            if (entity[x].isghost == false && this.size < entity[x].size - 10) {
+                                minlen = length;
+                                goaltype = "bot";
+                                this.goalx = entity[x].posx;
+                                this.goaly = entity[x].posy;
+                            } else if (entity[x].isghost == true && this.size - 10 > entity[x].size && entity[x].size > 81) {
+                                minlen = length;
+                                goaltype = "bot";
+                                this.goalx = entity[x].posx;
+                                this.goaly = entity[x].posy;
+                            }
+                        } else {
+                            if (entity[x].isghost == false && entity[x].size + 10 < this.size && this.size > 99) {
+                            minlen = length;
+                            goaltype = "bot";
+                            this.goalx = entity[x].posx;
+                            this.goaly = entity[x].posy;
+                            } else if (entity[x].isghost == true && this.size < entity[x].size) {
+                                minlen = length;
+                                goaltype = "bot";
+                                this.goalx = entity[x].posx;
+                                this.goaly = entity[x].posy;
+                            } 
+                        }
+                    }
+                }
+            }
+        }
+        if (!goaltype && this.isghost == false) {
             minlen = Infinity;
             for (let x = 0; x < drops.length; x++) { // отслеживание добычи
                 if (drops[x]) {
@@ -196,42 +286,38 @@ class Packman {
                     if (length < minlen) {
                         goaltype = "drop";
                         minlen = length;
-                        goalid = x;
+                        this.goalx = drops[x].posx;
+                        this.goaly = drops[x].posy;
                     }
                 }
             }
         }
-        if (goaltype == "drop" && drops[goalid]) {
-            this.goalx = drops[goalid].posx;
-            this.goaly = drops[goalid].posy;
-        } else if (goaltype == "bot" && entity[goalid]) {
-            this.goalx = entity[goalid].posx;
-            this.goaly = entity[goalid].posy;
-        } else if (goaltype == "ghost" && ghosts[goalid]) {
-            this.goalx = ghosts[goalid].posx;
-            this.goaly = ghosts[goalid].posy;
+        if (!goaltype && (this.goalx == null || this.goaly == null)) {
+            this.goalx = (borderwidth * Math.random()) - (borderwidth / 2);
+            this.goaly = (borderheight * Math.random()) - (borderheight / 2);
+            goaltype = "random";
         }
-        if (this.goalx != null && Math.abs(this.goalx - this.posx) > this.speed) { // преследование добычи
+        if (Math.abs(this.goalx - this.posx) > this.speed) { // преследование добычи
             if (this.posx < this.goalx && this.posx + this.size / 2 - 10 < borderwidth / 2) {
                 this.posx += this.speed;
                 domove = true;
             } else if (this.posx > this.goalx && this.posx - this.size / 2 - 10 > borderwidth / -2) {
                 this.posx -= this.speed;
                 domove = true;
-            } else {
-                this.goalx = null;
             }
+        } else {
+            this.goalx = null;
         }
-        if (this.goaly != null && Math.abs(this.goaly - this.posy) > this.speed) {
+        if (Math.abs(this.goaly - this.posy) > this.speed) {
             if (this.posy < this.goaly && this.posy + this.size / 2 - 10 < borderheight / 2) {
                 this.posy += this.speed;
                 domove = true;
             } else if (this.posy > this.goaly && this.posy - this.size / 2 - 10 > borderheight / -2) {
                 this.posy -= this.speed;
                 domove = true;
-            } else {
-                this.goaly = null;
             }
+        } else {
+            this.goaly = null;
         }
         if (domove == true) {
             let this_obj = document.querySelector(`.entity.id-${this.id}`);
@@ -241,14 +327,6 @@ class Packman {
     }
     update() {
         this.check_eat();
-        if (this.type == "Xplayer") {
-            if (this.size < 1201) {
-                scale = 1 - (0.0006 * this.size);
-            } else {
-                scale = 0.3;
-            }
-        }
-        this.speed = 1000 / this.size;
         if (this.type == "bot") {
             this.bot_behavior();
         }
@@ -259,13 +337,17 @@ class Drop {
     constructor(id) {
         this.posx = Math.random() * (borderwidth - 10) - (borderwidth - 10) / 2;
         this.posy = Math.random() * (borderheight - 10) - (borderheight - 10) / 2;
-        this.size = 20;
         this.id = id;
-        let randtype = Math.round(Math.random() * 20);
-        if (randtype == 1) {
+        let randtype = Math.round(Math.random() * 100);
+        if (randtype <= 1) {
+            this.type = "mega";
+            this.size = 40;
+        } else if (randtype > 1 && randtype <= 7) {
             this.type = "ultra";
+            this.size = 30;
         } else {
-            this.type = "default";
+            this.type = "degault";
+            this.size = 20;
         }
     }
     update() {
@@ -288,7 +370,7 @@ let ghosts = [];
 let player;
 let borderwidth = 8000;
 let borderheight = 3000;
-let scale = 1;
+let scale = 0.97;
 let changename = null;
 var audio1 = new Audio('sounds/PackmanFight.mp3');
 let audioactive = false;
@@ -403,6 +485,7 @@ function checkentity() {
     }
     if (!document.querySelector("#player")) {
         playerlive = false; 
+        player.size = 30;
     } else {
         playerlive = true;
     }
@@ -569,7 +652,7 @@ function nickgen() { // генерация ников
     let random;
     let maxact = Math.round(Math.random() * 2 + 2)
     for (let act = 0; act < maxact; act++) {
-        random = Math.round(Math.random() * 30);
+        random = Math.round(Math.random() * 36);
         if (act < maxact - 1) {
             switch (random) {
                 case 0: nick += "zig"; break;
@@ -603,6 +686,12 @@ function nickgen() { // генерация ников
                 case 28: nick += "go"; break;
                 case 29: nick += "mi"; break;
                 case 30: nick += "un"; break;
+                case 31: nick += "mar"; break;
+                case 32: nick += "vla"; break;
+                case 33: nick += "den"; break;
+                case 34: nick += "dan"; break;
+                case 35: nick += "ker"; break;
+                case 36: nick += "an"; break;
             }
         } else {
             switch (random) {
@@ -637,6 +726,12 @@ function nickgen() { // генерация ников
                 case 28: nick += "ne"; break;
                 case 29: nick += "ru"; break;
                 case 30: nick += "ti"; break;
+                case 31: nick += "chik"; break;
+                case 32: nick += "ba"; break;
+                case 33: nick += "mir"; break;
+                case 34: nick += "di"; break;
+                case 35: nick += "_"; break;
+                case 36: nick += "lina"; break;
             }
             if (random * Math.random() > 10) {
                 nick += String(Math.round(Math.random() * 100));
@@ -677,7 +772,7 @@ function botgen() { // Генерация ботов
                 maxp++;
             }
         }
-        if (maxp < 15) {
+        if (maxp < 20) {
             let obj_packman = document.createElement("div");
             obj_packman.classList.add(`packman`, `bot`, `entity`, `id-${entity.length + 1}`);
             document.querySelector(".game__area").append(obj_packman);
@@ -728,6 +823,7 @@ document.querySelector("#gamestart").addEventListener("click", function() {
         changename = nickgen();
     }
     player = new Packman(1, 0, 50, "Xplayer", changename);
+    player.viewupdate();
     entity.push(player);
     playerlive = true;
     startgame();
