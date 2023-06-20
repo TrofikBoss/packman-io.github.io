@@ -155,6 +155,10 @@ class Packman {
         this.isghost = true;
         this.emotion();
         this.viewupdate();
+        if (this.type == "Xplayer") {showmessage("Вы стали призраком")}
+        if (this.type == "Xplayer") {
+            document.querySelector("#game").style.filter = "sepia(0.4)"; 
+        }
     }
     check_eat() {
         if (this.isghost == false) {
@@ -165,10 +169,12 @@ class Packman {
                             this.size += 30;
                             this.score += 30;
                             this.emotion("smile");
+                            if (this.type == "Xplayer") {showmessage("Вы съели мега-сферу | +30 очков")}
                         } else if (drops[x].type == "ultra") {
                             this.size += 10;
                             this.score += 10;
                             this.emotion("smile");
+                            if (this.type == "Xplayer") {showmessage("Вы съели ультра-сферу | +10 очков")}
                         } else {
                             this.size += 1;
                             this.score += 1;
@@ -189,6 +195,7 @@ class Packman {
                             if (this.size + 7 > entity[x].size) {
                                 entity[x].become_ghost();
                                 this.emotion("smile");
+                                if (this.type == "Xplayer") {showmessage("Вы превратили пакмена в призрака")}
                             } else {
                                 entity[x].size -= 1.5;
                                 this.size += 1.5;
@@ -208,6 +215,7 @@ class Packman {
                             delete entity[x];
                             this.viewupdate();
                             this.emotion("smile");
+                            if (this.type == "Xplayer") {showmessage("Вы съели призрака")}
                         }
                     }
                 } else {
@@ -220,6 +228,7 @@ class Packman {
                             delete entity[x];
                             this.viewupdate();
                             this.emotion("smile");
+                            if (this.type == "Xplayer") {showmessage("Вы съели пакмена")}
                         }
                     } else {
                         if (entity[x].id != this.id && entity[x].isghost == true && this.size < entity[x].size) {
@@ -231,6 +240,7 @@ class Packman {
                                 delete entity[x];
                                 this.viewupdate();
                                 this.emotion("smile");
+                                if (this.type == "Xplayer") {showmessage("Вы съели призрака")}
                             }
                         } 
                     }
@@ -248,6 +258,7 @@ class Packman {
                         delete ghosts[x];
                         this.viewupdate();
                         this.emotion("smile");
+                        if (this.type == "Xplayer") {showmessage("Вы съели призрака")}
                     }
                 }
             }
@@ -654,6 +665,7 @@ function stopgame() {
     document.querySelector(".game__border, .leaderboard").style.display = "none";
     document.querySelector(".leave").style.display = "none";
     document.querySelector(".game__menu").style.display = "flex";
+    document.querySelector("#game").style.filter = "none";
     if (document.querySelector("#player")) {
         document.querySelector("#player").style.display = "none";
     }
@@ -837,8 +849,19 @@ function displaymove() {
     clWidth = document.body.clientWidth;
     clHeight = document.body.clientHeight;
     let obj_pl = document.querySelector("#player");
-    obj_pl.style.left = clWidth / 2 - 25 + "px";
+    obj_pl.style.left = clWidth / 2  + "px";
     obj_pl.style.top = clHeight / 2 - 25 + "px";
+}
+
+function showmessage(message) {
+    let obj_mess = document.querySelector(".message__bar")
+    obj_mess.textContent = message;
+    obj_mess.style.opacity = 0.7;
+    setTimeout(() => {
+        if (obj_mess.style.opacity == 0.7) {
+            obj_mess.style.opacity = 0;
+        }
+    }, 3000);
 }
 
 window.addEventListener("resize", function() {
