@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles/style-bV0.5.css">
+    <link rel="stylesheet" href="styles/style-bV0.6.css">
     <title>Document</title>
 </head>
 <body>
     <div id="game">
         <div class="touchpoint"></div>
+        <div class="page info" style="display: none">
+            <div class="button">Закрыть</div>
+            <iframe src="info.html" frameborder="0" height="100%" onclick="document.body.style.display = 'none'"></iframe>
+        </div>
         <div class="game__menu page">
             <div class="menu__header">
                 <h2>PackMan.io</h2>
@@ -36,12 +40,12 @@
                 </div>
             </div>
         </div>
-        <div class="page leaderboard">
+        <div class="page leaderboard" style="display: none">
             <h2>Лидеры</h2>
             <ul>
             </ul>
         </div>
-        <div class="page leave" style="display: none;">
+        <div class="page leave" style="display: none">
             <div class="button" id="leave">Выйти в меню</div>
         </div>
         <div class="game__container">

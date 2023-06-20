@@ -113,6 +113,26 @@ class Packman {
             document.querySelector(`.entity.id-${id}`).innerHTML = `<p>${this.name}</p>`;
         }
     }
+    emotion(emotion) {
+        if (!emotion) {
+            emotion = "";
+        } else {
+            emotion = "__" + emotion;
+        }
+        if (!this.isghost) {
+            document.querySelector(`.entity.id-${this.id}`).style.backgroundImage = `url(../textures/entity/packman${emotion}.png)`;
+            setTimeout(() => {
+                if (!this.isghost) {
+                    document.querySelector(`.entity.id-${this.id}`).style.backgroundImage = `url(../textures/entity/packman.png)`;
+                }
+            }, 5000);
+        } else {
+            document.querySelector(`.entity.id-${this.id}`).style.backgroundImage = `url(../textures/entity/packman__ghost${emotion}.png)`;
+            setTimeout(() => {
+                document.querySelector(`.entity.id-${this.id}`).style.backgroundImage = `url(../textures/entity/packman__ghost.png)`;
+            }, 5000);
+        }
+    }
     viewupdate() {
         document.querySelector(`.entity.id-${this.id}`).style.transform = `scale(${this.size / 50})`;
         if (this.type == "Xplayer") {
@@ -133,6 +153,7 @@ class Packman {
         document.querySelector(`.entity.id-${this.id}`).style.filter = `drop-shadow(0px 0px 5px rgb(67, 208, 255))`;
         this.size = 81;
         this.isghost = true;
+        this.emotion();
         this.viewupdate();
     }
     check_eat() {
@@ -143,9 +164,11 @@ class Packman {
                         if (drops[x].type == "mega") {
                             this.size += 30;
                             this.score += 30;
+                            this.emotion("smile");
                         } else if (drops[x].type == "ultra") {
                             this.size += 10;
                             this.score += 10;
+                            this.emotion("smile");
                         } else {
                             this.size += 1;
                             this.score += 1;
@@ -162,9 +185,10 @@ class Packman {
             if (entity[x]) {
                 if (this.isghost) { 
                     if (entity[x].id != this.id && entity[x].isghost == false && this.size < entity[x].size - 3) {
-                        if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2) == true) {
+                        if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2 - 20) == true) {
                             if (this.size + 7 > entity[x].size) {
                                 entity[x].become_ghost();
+                                this.emotion("smile");
                             } else {
                                 entity[x].size -= 1.5;
                                 this.size += 1.5;
@@ -176,34 +200,37 @@ class Packman {
                             }
                         }
                     } else if (entity[x].id != this.id && entity[x].isghost == true && this.size - 10 > entity[x].size && entity[x].size > 82) {
-                        if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2) == true) {
+                        if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2 - 20) == true) {
                             this.size += entity[x].size / 1.5;
                             this.score += entity[x].size / 1.5;
                             let elem = document.querySelector(`.entity.id-${Number(x) + 1}`);
                             elem.parentNode.removeChild(elem);
                             delete entity[x];
                             this.viewupdate();
+                            this.emotion("smile");
                         }
                     }
                 } else {
                     if (entity[x].id != this.id && entity[x].isghost == false && this.size > entity[x].size + 10) {
-                        if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2) == true) {
+                        if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2 - 20) == true) {
                             this.size += entity[x].size / 1.5;
                             this.score += entity[x].size / 1.5;
                             let elem = document.querySelector(`.entity.id-${Number(x) + 1}`);
                             elem.parentNode.removeChild(elem);
                             delete entity[x];
                             this.viewupdate();
+                            this.emotion("smile");
                         }
                     } else {
                         if (entity[x].id != this.id && entity[x].isghost == true && this.size < entity[x].size) {
-                            if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2) == true) {
+                            if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2 - 20) == true) {
                                 this.size += entity[x].size / 1.5;
                                 this.score += entity[x].size / 1.5;
                                 let elem = document.querySelector(`.entity.id-${Number(x) + 1}`);
                                 elem.parentNode.removeChild(elem);
                                 delete entity[x];
                                 this.viewupdate();
+                                this.emotion("smile");
                             }
                         } 
                     }
@@ -220,6 +247,7 @@ class Packman {
                         elem.parentNode.removeChild(elem);
                         delete ghosts[x];
                         this.viewupdate();
+                        this.emotion("smile");
                     }
                 }
             }
@@ -351,13 +379,12 @@ class Drop {
         }
     }
     update() {
-        let obj_this = document.querySelector(`.drop.id-${this.id + 1}`);
         this.size -= 0.08;
         if (Math.round(this.size) % 3 == 0) {
-            obj_this.style.transform = `scale(${this.size / 20})`;
+            document.querySelector(`.drop.id-${this.id + 1}`).style.transform = `scale(${this.size / 20})`;
         }
         if (this.size < 5) {
-            obj_this.parentNode.removeChild(obj_this);
+            document.querySelector(`.drop.id-${this.id + 1}`).parentNode.removeChild(document.querySelector(`.drop.id-${this.id + 1}`));
             delete drops[this.id];
         }
     }
@@ -380,7 +407,6 @@ let mouseX = 1000;
 let mouseY = 1000;
 let clWidth = document.body.clientWidth;
 let clHeight = document.body.clientHeight;
-//new Packman(2, 100, 100, "bot", "TestUser")
 
 function getlength(x1, y1, x2, y2) {
     return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
@@ -516,7 +542,7 @@ function leaderboard_update() {
     let thisid;
     for (let x = 0; x < entity.length; x++) {
         if (entity[x]) {
-            mas.push({"size": entity[x].size, "name": entity[x].name, "score": entity[x].score});
+            mas.push({"size": entity[x].size, "name": entity[x].name, "score": entity[x].score, "isghost": entity[x].isghost});
         }
     }
     for (let y = 0; y < mas.length; y++) { 
@@ -538,6 +564,9 @@ function leaderboard_update() {
     for (let x = 0; x < 6 && x < finalmas.length; x++) {
         obj_li = document.createElement("li");
         obj_li.textContent = `${finalmas[x].name} - ${Math.round(finalmas[x].size)} [${Math.round(finalmas[x].score)}]`
+        if (finalmas[x].isghost == true) {
+            obj_li.classList.add("ghost-text");
+        }
         obj_ul.append(obj_li);
     }
     obj_li = document.createElement("li");
@@ -845,6 +874,12 @@ document.querySelector("#name").addEventListener("keydown", function(a) {
     if (gamestart == false && a.key == "Enter") {
         changename = document.querySelector('#name').value;
     }
+})
+document.querySelector(".page.learn").addEventListener("click", function() {
+    document.querySelector(".page.info").style.display = "flex";
+})
+document.querySelector(".page.info .button").addEventListener("click", function() {
+    document.querySelector(".page.info").style.display = "none";
 })
 
 function vksub() {

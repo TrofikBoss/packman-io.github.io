@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/style-bV0.6.css">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Как играть?? PackMan.io</h2>
+    <p>Основная суть игры PackMan.io - быть пакменом, который сможет стать сильнейшим на арене и набрать больше всех очков.
+       Нужно становиться сильнее и есть других пакменов, но нужно быть осторожным, на великой арене пакменов обитают призраки и там много опасностей...
+    </p>
+    <div class="cont">
+        <div class="info__block">
+            <h3>Как играть в целом?</h3>
+            <p>1. Вам нужно есть синие сферы. Они добавляют вам силы и очки.</p>
+            <img src="textures/images/learn1.png" alt="">
+            <p>2. Ешьте сферы и становитесь больше.</p>
+            <img src="textures/images/learn2.png" alt="">
+            <p>3. Ешьте пакменов, которые меньше вас, и убегайте от тех, которые больше вас.</p>
+            <img src="textures/images/learn3.png" alt="">
+            <p>4. Остерегайтесь призраков. Они очень опасны.</p>
+            <img src="textures/images/learn4.png" alt="">
+        </div>
+        <div class="info__block">
+            <h3>Как бороться с призраками?</h3>
+            <p>1. Вам нужно держаться подальше от призраков, особенно, если вы большой и сильный, они любят таких есть.. Ам!!</p>
+            <img src="textures/images/learn4.png" alt="">
+            <p>2. Если вы маленький, и у вас меньше 80 единиц силы, вы можете есть призраков. Поэтому маленьких пакменов лучше оставить, они могут спасти вас от призраков.</p>
+            <img src="textures/images/learn5.png" alt="">
+            <p>3. Если вы встретили призрака пакмена, которого вы меньше, то вы можете его съесть, если вы меньше его. Только не забывайте, что вы растёте...</p>
+            <img src="textures/images/learn6.png" alt="">
+        </div>
+        <div class="info__block">
+            <h3>Что делать, если вы стали призраком?</h3>
+            <p>1. Вам нужно держаться подальше от маленьких пакменов, они хоть только и появились, но они чувствуют, что вас можно съесть, ам ням...</p>
+            <img src="textures/images/learn6.png" alt="">
+            <p>2. Ешьте крупных пакменов, они большие и не поворотливые, вы успеете их догнать и съесть... До конца вы их не съедите, вы всего-лишь заберёте у них их силу, а они станут призраками.</p>
+            <img src="textures/images/learn7.png" alt="">
+            <p>3. Между призраками почти такие же правила, как и между обычными пакменами. Хоть они и стали призраками, своё стремление к превосходству они не забыли. Крупные призраки едят более мелких, но только что появившихся призраков они съесть не могут...</p>
+            <img src="textures/images/learn8.png" alt="">
+        </div>
+    </div>
+</body>
+<script>
+    document.addEventListener("click", function() {
+        document.querySelector(".page.info").style.display = "none";
+    })
+</script>
+<style>
+    * {
+        color: white;
+    }
+    body {
+        overflow-y: scroll;
+        padding: 20px;
+    }
+    h2 {
+        font-size: 30px;
+        text-align: center;
+        margin-top: 0px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid white;
+    }
+    p {
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+    .cont {
+        margin-top: 30px;
+        padding-bottom: 30px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+    .info__block h3 {
+        margin-top: 15px;
+        margin-bottom: 8px;
+    }
+    .info__block {
+        display: flex;
+        width: calc(33% - 40px);
+        border: 5px double white;
+        padding: 5px;
+        flex-direction: column;
+        margin-bottom: 20px;
+    }
+    .info__block img {
+        width: 40%;
+        border: 2px solid white;
+        transition: 0.2s;
+    }
+    img:hover {
+        transform: scale(1.5) translateX(16%) translateY(16%);
+    }
+    @media (max-width: 1000px) {
+        body {
+            padding: 10px;
+        }
+        .info__block {
+            width: calc((50% - 30px));
+        }
+    }
+    @media (max-width: 750px) {
+        .info__block {
+            width: 100%;
+        }
+    }
+</style>
+</html>
