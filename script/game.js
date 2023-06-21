@@ -20,8 +20,10 @@ class Ghost {
                             entity[x].become_ghost();
                             entity[x].viewupdate();
                         } else {
-                            entity[x].size -= 1.5;
+                            entity[x].size -= 2;
                             if (Math.round(entity[x].size) % 4 == 0) {
+                                entity[x].viewupdate();
+                            } else if (Math.round(entity[x].size) % 3 == 0) {
                                 entity[x].viewupdate();
                             }
                         }
@@ -185,10 +187,13 @@ class Packman {
                                 this.emotion("smile");
                                 if (this.type == "Xplayer") {showmessage("Вы превратили пакмена в призрака")}
                             } else {
-                                entity[x].size -= 1.5;
-                                this.size += 1.5;
-                                this.score += 1.5;
+                                entity[x].size -= 2;
+                                this.size += 2;
+                                this.score += 2;
                                 if (Math.round(this.size) % 4 == 0) {
+                                    this.viewupdate();
+                                    entity[x].viewupdate();
+                                } else if (Math.round(this.size) % 3 == 0) {
                                     this.viewupdate();
                                     entity[x].viewupdate();
                                 }
