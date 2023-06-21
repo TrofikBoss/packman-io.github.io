@@ -137,6 +137,7 @@ class Packman {
         } else {
             this.speed = 750 / this.size;
         }
+        leaderboard_update();
     }
     become_ghost() {
         document.querySelector(`.entity.id-${this.id}`).classList.add("packman__ghost");
@@ -181,7 +182,7 @@ class Packman {
             if (entity[x]) {
                 if (this.isghost) { 
                     if (entity[x].id != this.id && entity[x].isghost == false && this.size < entity[x].size - 3) {
-                        if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2 - 20) == true) {
+                        if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2) == true) {
                             if (this.size + 7 > entity[x].size) {
                                 entity[x].become_ghost();
                                 this.emotion("smile");
@@ -200,20 +201,21 @@ class Packman {
                             }
                         }
                     } else if (entity[x].id != this.id && entity[x].isghost == true && this.size - 10 > entity[x].size && entity[x].size > 82) {
-                        if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2 - 20) == true) {
+                        if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2) == true) {
                             this.size += entity[x].size / 1.5;
                             this.score += entity[x].size / 1.5;
                             let elem = document.querySelector(`.entity.id-${Number(x) + 1}`);
                             elem.parentNode.removeChild(elem);
+                            if (this.type == "Xplayer") {showmessage("Вы съели призрака")}
+                            if (entity[x].type == "Xplayer") {showmessage("Вас съел призрак")}
                             delete entity[x];
                             this.viewupdate();
                             this.emotion("smile");
-                            if (this.type == "Xplayer") {showmessage("Вы съели призрака")}
                         }
                     }
                 } else {
                     if (entity[x].id != this.id && entity[x].isghost == false && this.size > entity[x].size + 10) {
-                        if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2 - 20) == true) {
+                        if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2) == true) {
                             this.size += entity[x].size / 1.5;
                             this.score += entity[x].size / 1.5;
                             let elem = document.querySelector(`.entity.id-${Number(x) + 1}`);
@@ -222,10 +224,11 @@ class Packman {
                             this.viewupdate();
                             this.emotion("smile");
                             if (this.type == "Xplayer") {showmessage("Вы съели пакмена")}
+                            if (entity[x].type == "Xplayer") {showmessage("Вас съел пакмен")}
                         }
                     } else {
                         if (entity[x].id != this.id && entity[x].isghost == true && this.size < entity[x].size) {
-                            if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2 - 20) == true) {
+                            if(checkbox(this.posx, this.posy, this.size / 2, entity[x].posx, entity[x].posy, entity[x].size / 2) == true) {
                                 this.size += entity[x].size / 1.5;
                                 this.score += entity[x].size / 1.5;
                                 let elem = document.querySelector(`.entity.id-${Number(x) + 1}`);
@@ -234,6 +237,7 @@ class Packman {
                                 this.viewupdate();
                                 this.emotion("smile");
                                 if (this.type == "Xplayer") {showmessage("Вы съели призрака")}
+                                if (entity[x].type == "Xplayer") {showmessage("Вас съел пакмен")}
                             }
                         } 
                     }
@@ -353,8 +357,8 @@ class Packman {
         }
         if (domove == true) {
             let this_obj = document.querySelector(`.entity.id-${this.id}`);
-            this_obj.style.left = `${this.posx - this.size / 2}px`;
-            this_obj.style.top = `${this.posy - this.size / 2}px`;
+            this_obj.style.left = `${this.posx - 25}px`;
+            this_obj.style.top = `${this.posy - 25}px`;
         }
     }
     update() {
@@ -474,6 +478,7 @@ function checksensor() {
         cursorposset = true; 
     }
     if (gamestart == true && cursorposset == true && downmouse == true && sensorblock == false) {
+        player_changes("pos");
         let ybust = Math.abs((ycenter - mouseY) / ycenter) * 5;
         if (ybust > 1) {
             ybust = 1;
@@ -522,6 +527,9 @@ function checkentity() {
 }
 
 function movePlayer() {
+    if (buttons.left || buttons.right || buttons.top || buttons.bottom) {
+        player_changes("pos");
+    }
     if (buttons.left == true && player.posx - player.size / 2 - 10 > borderwidth / -2) {
         player.posx -= player.speed;
     }
@@ -595,6 +603,13 @@ function gamecontainer_control() {
     document.querySelector(".game__area").style.left = `${offsetX}px`;
     document.querySelector(".game__area").style.top = `${offsetY}px`;
 }
+function player_changes(typechange) {
+    if (typechange == "pos") {
+        gamecontainer_control();
+    } else if (typechange == "size") {
+        gamecontainer_control();
+    }
+}
 
 document.body.addEventListener("mouseup", function(click) {
     downmouse = false;
@@ -607,14 +622,31 @@ document.body.addEventListener("mousedown", function(click) {
     mouseX = click.clientX;
     mouseY = click.clientY;
 })
+let mousetick = 0;
 document.body.addEventListener("mousemove", function(move) {
-    mouseX = move.clientX;
-    mouseY = move.clientY;
+    if (mousetick == 0) {
+        mouseX = move.clientX;
+        mouseY = move.clientY;
+    }
+    mousetick += 1;
+    if (mousetick == 8) { // считывание координат мыши каждые 8 тиков
+        mouseX = move.clientX;
+        mouseY = move.clientY;
+        mousetick = 0;
+    }
 })
 document.querySelector("#game").addEventListener("touchmove", function(move) {
     downmouse = true;
-    mouseX = move.touches[0].screenX;
-    mouseY = move.touches[0].screenY;
+    if (mousetick == 0) {
+        mouseX = move.touches[0].screenX;
+        mouseY = move.touches[0].screenY;
+    }
+    mousetick += 1;
+    if (mousetick == 8) { // считывание координат мыши каждые 8 тиков
+        mouseX = move.touches[0].screenX;
+        mouseY = move.touches[0].screenY;
+        mousetick = 0;
+    }
 })
 document.body.addEventListener("touchend", function(move) {
     downmouse = false;
@@ -625,17 +657,21 @@ document.body.addEventListener("touchend", function(move) {
 let audioobrez = [1, 0]; // обрезание аудио, если нужно
 
 function startgame() {
+    offsetX = (clWidth / 2) - player.posx;
+    offsetY = (clHeight / 2) - player.posy;
     document.querySelector(".game__border, #player, .leaderboard").style.display = "flex";
     document.querySelector(".game__menu, .leave").style.display = "none";
     document.querySelector(`.entity.id-${player.id}`).style.left = `${document.body.clientWidth / 2 - player.size / 2}px`;
     document.querySelector(`.entity.id-${player.id}`).style.top = `${document.body.clientHeight / 2 - player.size / 2}px`;
     border_control();
+    gamecontainer_control();
     if (audioactive == false) {
         audio1.play();
         audio1.volume = 0.7;
         audioactive = true;
         audio1.currentTime = audioobrez[0];
     }
+    leaderboard_update();
 }
 function getRandTitle() {
     let rand = Math.round(Math.random() * 10);
@@ -673,8 +709,6 @@ function update() {
         movePlayer();
         checkentity();
         checksensor();
-        leaderboard_update();
-        gamecontainer_control();
     }
     if (playerlive == false && gamestart == true) {
         document.querySelector(".leave").style.display = "flex";
@@ -813,6 +847,7 @@ function botgen() { // Генерация ботов
             entity.push(new Packman(entity.length + 1, Math.random() * borderwidth - borderwidth / 2, Math.random() * borderheight - borderheight / 2, "bot", nickgen()));
             obj_packman.style.left = `${entity[entity.length - 1].posx - entity[entity.length - 1].size / 2}px`;
             obj_packman.style.top = `${entity[entity.length - 1].posy - entity[entity.length - 1].size / 2}px`;
+            leaderboard_update();
         }
     }
 }
@@ -828,7 +863,7 @@ function ghostgen() { // Генерация призраков
     }
 }
 
-setInterval(() => {
+setInterval(() => { // интервалы исполнения разных функций
     botgen();
     if (audio1.currentTime == audio1.duration) {
         audio1.play();
