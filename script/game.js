@@ -114,24 +114,12 @@ class Packman {
         }
     }
     emotion(emotion) {
-        if (!emotion) {
-            emotion = "";
-        } else {
-            emotion = "__" + emotion;
-        }
-        if (!this.isghost) {
-            document.querySelector(`.entity.id-${this.id}`).style.backgroundImage = `url(../textures/entity/packman${emotion}.png)`;
-            setTimeout(() => {
-                if (!this.isghost) {
-                    document.querySelector(`.entity.id-${this.id}`).style.backgroundImage = `url(../textures/entity/packman.png)`;
-                }
-            }, 5000);
-        } else {
-            document.querySelector(`.entity.id-${this.id}`).style.backgroundImage = `url(../textures/entity/packman__ghost${emotion}.png)`;
-            setTimeout(() => {
-                document.querySelector(`.entity.id-${this.id}`).style.backgroundImage = `url(../textures/entity/packman__ghost.png)`;
-            }, 5000);
-        }
+        document.querySelector(`.entity.id-${this.id}`).classList.add(emotion);
+        setTimeout(() => {
+            if (!this.isghost) {
+                document.querySelector(`.entity.id-${this.id}`).classList.remove(emotion);
+            }
+        }, 5000);
     }
     viewupdate() {
         document.querySelector(`.entity.id-${this.id}`).style.transform = `scale(${this.size / 50})`;
