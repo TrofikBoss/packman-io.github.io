@@ -118,7 +118,7 @@ class Packman {
     emotion(emotion) {
         document.querySelector(`.entity.id-${this.id}`).classList.add(emotion);
         setTimeout(() => {
-            if (!this.isghost) {
+            if (this) {
                 document.querySelector(`.entity.id-${this.id}`).classList.remove(emotion);
             }
         }, 5000);
@@ -131,6 +131,10 @@ class Packman {
             } else {
                 scale = 0.3;
             }
+            playerscore = player.score;
+            localStorage.setItem('sumscore', Number(localStorage.getItem('sumscore')) + (playerscore - scoreload));
+            scoreload = playerscore;
+            playerscore = 0;
         }
         if (!this.isghost) {
             this.speed = 1000 / this.size;
@@ -172,8 +176,8 @@ class Packman {
                         }
                         let elem = document.querySelector(`.drop.id-${Number(x) + 1}`);
                         elem.parentNode.removeChild(elem);
-                        delete drops[x];
                         this.viewupdate();
+                        delete drops[x];
                     }
                 }
             }
@@ -208,9 +212,9 @@ class Packman {
                             elem.parentNode.removeChild(elem);
                             if (this.type == "Xplayer") {showmessage("Вы съели призрака")}
                             if (entity[x].type == "Xplayer") {showmessage("Вас съел призрак")}
-                            delete entity[x];
                             this.viewupdate();
                             this.emotion("smile");
+                            delete entity[x];
                         }
                     }
                 } else {
@@ -220,11 +224,11 @@ class Packman {
                             this.score += entity[x].size / 1.5;
                             let elem = document.querySelector(`.entity.id-${Number(x) + 1}`);
                             elem.parentNode.removeChild(elem);
-                            delete entity[x];
                             this.viewupdate();
                             this.emotion("smile");
                             if (this.type == "Xplayer") {showmessage("Вы съели пакмена")}
                             if (entity[x].type == "Xplayer") {showmessage("Вас съел пакмен")}
+                            delete entity[x];
                         }
                     } else {
                         if (entity[x].id != this.id && entity[x].isghost == true && this.size < entity[x].size) {
@@ -233,11 +237,11 @@ class Packman {
                                 this.score += entity[x].size / 1.5;
                                 let elem = document.querySelector(`.entity.id-${Number(x) + 1}`);
                                 elem.parentNode.removeChild(elem);
-                                delete entity[x];
                                 this.viewupdate();
                                 this.emotion("smile");
                                 if (this.type == "Xplayer") {showmessage("Вы съели призрака")}
                                 if (entity[x].type == "Xplayer") {showmessage("Вас съел пакмен")}
+                                delete entity[x];
                             }
                         } 
                     }
@@ -252,10 +256,10 @@ class Packman {
                         this.score += 25;
                         let elem = document.querySelector(`.ghost.id-${Number(x) + 1}`);
                         elem.parentNode.removeChild(elem);
-                        delete ghosts[x];
                         this.viewupdate();
                         this.emotion("smile");
                         if (this.type == "Xplayer") {showmessage("Вы съели призрака")}
+                        delete ghosts[x];
                     }
                 }
             }
@@ -415,6 +419,8 @@ let mouseX = 1000;
 let mouseY = 1000;
 let clWidth = document.body.clientWidth;
 let clHeight = document.body.clientHeight;
+let playerscore = 0;
+let scoreload = 0;
 
 function getlength(x1, y1, x2, y2) {
     return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
@@ -524,6 +530,7 @@ function checkentity() {
     } else {
         playerlive = true;
     }
+    
 }
 
 function movePlayer() {
@@ -701,6 +708,10 @@ function stopgame() {
     document.querySelectorAll(".entity, .drop, .ghost").forEach(function(en) {
         en.outerHTML = "";
     })
+    if (!localStorage.getItem('sumscore')) {
+        localStorage.setItem('sumscore', 0);
+    }
+    document.querySelector(".button.bal p").textContent = `- ${Math.round(localStorage.getItem('sumscore'))} очков`;
 }
 stopgame();
 
