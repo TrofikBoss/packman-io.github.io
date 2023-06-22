@@ -51,6 +51,7 @@ body {
     background-image: url(../textures/entity/packman__smile.png);
 }
 .packman__ghost {
+    background-color: aqua;
     opacity: 0.6;
     background-image: url(../textures/entity/packman__ghost.png);
 }
