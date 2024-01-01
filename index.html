@@ -38,6 +38,9 @@
                         <div class="drop_ type-ultra"></div>
                         <p>- 0 очков</p>
                     </div>
+                    <div class="button buyboost" onclick="buyBoost(1)">
+                        <p>Купить скорость<br>200 очков</p>
+                    </div>
                     <div class="button" id="gamestart">Начать игру</div>
                 </div>
                 <div class="menu__right">
@@ -52,6 +55,11 @@
             <ul>
             </ul>
         </div>
+        <div class="page boostlist">
+            <div class="page item nostock boost_1" onclick="addBoost(0, 'speed', 8, 2)">
+                <p>Скорость<br>2x - <span class="boost_1__count"></span>шт</p>
+            </div>
+        </div> 
         <div class="page leave" style="display: none">
             <div class="button" id="leave">Выйти в меню</div>
         </div>

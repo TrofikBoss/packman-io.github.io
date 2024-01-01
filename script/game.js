@@ -21,11 +21,7 @@ class Ghost {
                             entity[x].viewupdate();
                         } else {
                             entity[x].size -= 2;
-                            if (Math.round(entity[x].size) % 4 == 0) {
-                                entity[x].viewupdate();
-                            } else if (Math.round(entity[x].size) % 3 == 0) {
-                                entity[x].viewupdate();
-                            }
+                            entity[x].viewupdate();
                         }
                     }
                 }
@@ -94,6 +90,7 @@ class Packman {
         this.speed = 20;
         this.size = 50;
         this.score = 0;
+        this.boost = [{name: 'speed', power: 1, time: 0}];
         this.type = type;
         this.isghost = isghost;
         if (isghost == true) {
@@ -116,10 +113,11 @@ class Packman {
         }
     }
     emotion(emotion) {
-        document.querySelector(`.entity.id-${this.id}`).classList.add(emotion);
+        let this_obj = document.querySelector(`.entity.id-${this.id}`);
+        this_obj.classList.add(emotion);
         setTimeout(() => {
-            if (this) {
-                document.querySelector(`.entity.id-${this.id}`).classList.remove(emotion);
+            if (this && this_obj) {
+                this_obj.classList.remove(emotion);
             }
         }, 5000);
     }
@@ -131,15 +129,18 @@ class Packman {
             } else {
                 scale = 0.3;
             }
+            let player_obj = document.querySelector(`.entity.id-${this.id}`);
+            player_obj.style.left = `${(clWidth + ((clWidth / scale) - clWidth)) / 2 - player_obj.clientWidth / 2}px`;
+            player_obj.style.top = `${clHeight / 2 - player_obj.clientHeight / 2}px`;
             playerscore = player.score;
             localStorage.setItem('sumscore', Number(localStorage.getItem('sumscore')) + (playerscore - scoreload));
             scoreload = playerscore;
             playerscore = 0;
         }
         if (!this.isghost) {
-            this.speed = 1000 / this.size;
+            this.speed = 1000 / this.size * this.boost[0].power;
         } else {
-            this.speed = 750 / this.size;
+            this.speed = 750 / this.size * this.boost[0].power;
         }
         leaderboard_update();
     }
@@ -174,10 +175,10 @@ class Packman {
                             this.size += 1;
                             this.score += 1;
                         }
+                        delete drops[x];
                         let elem = document.querySelector(`.drop.id-${Number(x) + 1}`);
                         elem.parentNode.removeChild(elem);
                         this.viewupdate();
-                        delete drops[x];
                     }
                 }
             }
@@ -270,7 +271,7 @@ class Packman {
         let goalid;
         let goaltype;
         let domove = false;
-        if ((this.size < 81 && this.isghost == false) || (this.size > 100 && this.isghost == true)) {
+        if ((this.isghost == false && this.size < 81) || (this.isghost == true && this.size > 100)) {
             for (let x = 0; x < entity.length; x++) { // отслеживание добычи
                 if (ghosts[x]) {
                     let length = getlength(this.posx, this.posy, ghosts[x].posx, ghosts[x].posy);
@@ -370,6 +371,15 @@ class Packman {
         if (this.type == "bot") {
             this.bot_behavior();
         }
+        if (this.boost[0].time > 0) {
+            this.boost[0].time -= 0.04;
+        } else {
+            if (this.boost[0].power != 1) {
+                this.boost[0].time = 0;
+                this.boost[0].power = 1;
+                this.viewupdate();
+            }
+        }
     }
 }
 
@@ -386,7 +396,7 @@ class Drop {
             this.type = "ultra";
             this.size = 30;
         } else {
-            this.type = "degault";
+            this.type = "default"; 
             this.size = 20;
         }
     }
@@ -508,20 +518,82 @@ function checksensor() {
     }
 }
 
+function addBoost(id, name, time, power) {
+    if (id == 0) {
+        if (JSON.parse(localStorage.getItem('boosts'))[0] > 0) {
+            let x = JSON.parse(localStorage.getItem('boosts'));
+            x[0] -= 1;
+            localStorage.setItem('boosts', JSON.stringify(x));
+            player.boost[0] = {name: name, time: time, power: power};
+            player.viewupdate();
+            scoreupdate();
+            showmessage('Вы применили "Скорость 2Х"');
+        }
+    }
+}
+function buyBoost(id) {
+    if (id == 1) {
+        let x = JSON.parse(localStorage.getItem('boosts'));
+        x[0] += 1;
+        localStorage.setItem('boosts', JSON.stringify(x));
+        localStorage.setItem('sumscore', localStorage.getItem('sumscore') - 200);
+    }
+
+    scoreupdate();
+}
+
 function checkentity() {
+    let var_scale_offsetX = ((clWidth / scale) - clWidth) / 2;
+    let var_scale_offsetY = ((clHeight / scale) - clHeight) / 2;
     for (let x = 0; x < entity.length; x++) {
         if (entity[x]) {
             entity[x].update();
+            let this_obj = document.querySelector(`.entity.id-${entity[x].id + 1}`);
+            if (this_obj) {
+                if (entity[x].posx + entity[x].size / 2 + offsetX > 0 - var_scale_offsetX && entity[x].posx - entity[x].size / 2 + offsetX < clWidth + var_scale_offsetX && entity[x].posy + entity[x].size / 2 + offsetY > 0 - var_scale_offsetY && entity[x].posy - entity[x].size + offsetY < clHeight + var_scale_offsetY) {
+                    if (this_obj.hidden == true) {
+                        this_obj.hidden = false;
+                    }
+                } else {
+                    if (this_obj.hidden == false) {
+                        this_obj.hidden = true;
+                    }
+                }
+            }
         }
     }
     for (let x = 0; x < drops.length; x++) {
         if (drops[x]) {
+            if (document.querySelector(`.drop.id-${drops[x].id + 1}`)) {
+                let this_obj = document.querySelector(`.drop.id-${drops[x].id + 1}`);
+                if (drops[x].posx + drops[x].size / 2 + offsetX > -50 - var_scale_offsetX && drops[x].posx - drops[x].size / 2 + offsetX < clWidth + var_scale_offsetX + 50 && drops[x].posy + drops[x].size / 2 + offsetY > -50 - var_scale_offsetY && drops[x].posy - drops[x].size + offsetY < clHeight + var_scale_offsetY) {
+                    if (this_obj.hidden == true) {
+                        this_obj.hidden = false;
+                    }
+                } else {
+                    if (this_obj.hidden == false) {
+                        this_obj.hidden = true;
+                    }
+                }
+            }
             drops[x].update();
         }
     }
     for (let x = 0; x < ghosts.length; x++) {
         if (ghosts[x]) {
             ghosts[x].update();
+            let this_obj = document.querySelector(`.ghost.id-${ghosts[x].id + 1}`);
+            if (this_obj) {
+                if (ghosts[x].posx + ghosts[x].size / 2 + offsetX > 0 - var_scale_offsetX && ghosts[x].posx - ghosts[x].size / 2 + offsetX < clWidth + var_scale_offsetX && ghosts[x].posy + ghosts[x].size / 2 + offsetY > 0 - var_scale_offsetY && ghosts[x].posy - ghosts[x].size + offsetY < clHeight + var_scale_offsetY) {
+                    if (this_obj.hidden == true) {
+                        this_obj.hidden = false;
+                    }
+                } else {
+                    if (this_obj.hidden == false) {
+                        this_obj.hidden = true;
+                    }
+                }
+            }
         }
     }
     if (!document.querySelector("#player")) {
@@ -550,14 +622,13 @@ function movePlayer() {
         player.posy += player.speed;
     } 
 
-    offsetX = (clWidth / 2) - player.posx;
+    offsetX = (clWidth + ((clWidth / scale) - clWidth)) / 2 - player.posx; 
     offsetY = (clHeight / 2) - player.posy;
 }
 
 function leaderboard_update() {
     let mas = [];
     let finalmas = [];
-    let max;
     let thisid;
     for (let x = 0; x < entity.length; x++) {
         if (entity[x]) {
@@ -565,7 +636,7 @@ function leaderboard_update() {
         }
     }
     for (let y = 0; y < mas.length; y++) { 
-        max = 0;
+        let max = 0;
         for (let x = 0; x < mas.length; x++) {
             if (mas[x] && mas[x].size > max) {
                 max = mas[x].size;
@@ -611,9 +682,7 @@ function gamecontainer_control() {
     document.querySelector(".game__area").style.top = `${offsetY}px`;
 }
 function player_changes(typechange) {
-    if (typechange == "pos") {
-        gamecontainer_control();
-    } else if (typechange == "size") {
+    if (typechange == "pos" || typechange == "size") {
         gamecontainer_control();
     }
 }
@@ -631,29 +700,13 @@ document.body.addEventListener("mousedown", function(click) {
 })
 let mousetick = 0;
 document.body.addEventListener("mousemove", function(move) {
-    if (mousetick == 0) {
-        mouseX = move.clientX;
-        mouseY = move.clientY;
-    }
-    mousetick += 1;
-    if (mousetick == 8) { // считывание координат мыши каждые 8 тиков
-        mouseX = move.clientX;
-        mouseY = move.clientY;
-        mousetick = 0;
-    }
+    mouseX = move.clientX;
+    mouseY = move.clientY;
 })
 document.querySelector("#game").addEventListener("touchmove", function(move) {
     downmouse = true;
-    if (mousetick == 0) {
-        mouseX = move.touches[0].screenX;
-        mouseY = move.touches[0].screenY;
-    }
-    mousetick += 1;
-    if (mousetick == 8) { // считывание координат мыши каждые 8 тиков
-        mouseX = move.touches[0].screenX;
-        mouseY = move.touches[0].screenY;
-        mousetick = 0;
-    }
+    mouseX = move.touches[0].screenX;
+    mouseY = move.touches[0].screenY;
 })
 document.body.addEventListener("touchend", function(move) {
     downmouse = false;
@@ -661,22 +714,22 @@ document.body.addEventListener("touchend", function(move) {
     document.querySelector(".touchpoint").style.display = "none";
 })
 
-let audioobrez = [1, 0]; // обрезание аудио, если нужно
-
 function startgame() {
-    offsetX = (clWidth / 2) - player.posx;
+    let player_obj = document.querySelector(`.entity.id-${this.id}`);
+            //player_obj.style.left = `${(clWidth + ((clWidth / scale) - clWidth)) / 2 - player_obj.clientWidth / 2}px`;
+            //(clWidth + ((clWidth / scale) - clWidth)) / 2 - player_obj.clientWidth / 2
+    offsetX = (clWidth + ((clWidth / scale) - clWidth)) / 2 - player.posx; 
     offsetY = (clHeight / 2) - player.posy;
     document.querySelector(".game__border, #player, .leaderboard").style.display = "flex";
     document.querySelector(".game__menu, .leave").style.display = "none";
-    document.querySelector(`.entity.id-${player.id}`).style.left = `${document.body.clientWidth / 2 - player.size / 2}px`;
-    document.querySelector(`.entity.id-${player.id}`).style.top = `${document.body.clientHeight / 2 - player.size / 2}px`;
+    player.viewupdate();
     border_control();
     gamecontainer_control();
     if (audioactive == false) {
         audio1.play();
         audio1.volume = 0.7;
         audioactive = true;
-        audio1.currentTime = audioobrez[0];
+        audio1.currentTime = 1;
     }
     leaderboard_update();
 }
@@ -696,6 +749,21 @@ function getRandTitle() {
         case 10: return "Самая прикольная игра!!";  
     }
 }
+function scoreupdate() {
+    if (!localStorage.getItem('sumscore')) {
+        localStorage.setItem('sumscore', 0);
+    }
+    if (!localStorage.getItem('boosts')) {
+        localStorage.setItem('boosts', "[0]");
+    }
+    document.querySelector(".boostlist .boost_1__count").textContent = JSON.parse(localStorage.getItem('boosts'))[0];
+    if (JSON.parse(localStorage.getItem('boosts'))[0] == 0) {
+        document.querySelector(".boostlist .boost_1").classList.add("nostock");
+    } else {
+        document.querySelector(".boostlist .boost_1").classList.remove("nostock");
+    }
+    document.querySelector(".button.bal p").textContent = `- ${Math.round(localStorage.getItem('sumscore'))} очков`;
+}
 function stopgame() {
     document.querySelector(".menu__header h2").innerHTML = `PackMan.io - ${getRandTitle()}`;
     document.querySelector(".game__border, .leaderboard").style.display = "none";
@@ -708,12 +776,14 @@ function stopgame() {
     document.querySelectorAll(".entity, .drop, .ghost").forEach(function(en) {
         en.outerHTML = "";
     })
-    if (!localStorage.getItem('sumscore')) {
-        localStorage.setItem('sumscore', 0);
-    }
-    document.querySelector(".button.bal p").textContent = `- ${Math.round(localStorage.getItem('sumscore'))} очков`;
+    
+    scoreupdate();
 }
 stopgame();
+
+function sss() {
+    gamestart = false;
+}
 
 function update() {
     if (gamestart) {
@@ -904,7 +974,7 @@ function showmessage(message) {
 }
 
 window.addEventListener("resize", function() {
-    displaymove()
+    displaymove();
 })
 
 document.querySelector("#gamestart").addEventListener("click", function() {
