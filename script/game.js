@@ -533,13 +533,14 @@ function addBoost(id, name, time, power) {
 }
 function buyBoost(id) {
     if (id == 1) {
-        let x = JSON.parse(localStorage.getItem('boosts'));
-        x[0] += 1;
-        localStorage.setItem('boosts', JSON.stringify(x));
-        localStorage.setItem('sumscore', localStorage.getItem('sumscore') - 200);
+        if (localStorage.getItem('sumscore') >= 200) {
+            let x = JSON.parse(localStorage.getItem('boosts'));
+            x[0] += 1;
+            localStorage.setItem('boosts', JSON.stringify(x));
+            localStorage.setItem('sumscore', localStorage.getItem('sumscore') - 200);
+            scoreupdate();
+        }
     }
-
-    scoreupdate();
 }
 
 function checkentity() {
